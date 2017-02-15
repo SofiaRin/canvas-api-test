@@ -27,25 +27,19 @@ window.onload = function () {
     var context2D = canvas.getContext("2d");
     context2D.fillStyle = "#0000FF";
     context2D.strokeStyle = "#FF0000";
-    //var image = document.getElementById('test_image') as HTMLImageElement;
-    //var image = document.createElement("test_image") as HTMLImageElement;
-    var image = new Image();
-    image.src = "S_Watcher.png";
-    image.onload = function () {
-        var x = 0;
-        setInterval(function () {
-            context2D.clearRect(0, 0, canvas.width, canvas.height);
-            context2D.drawImage(image, 0, 0);
-        }, 100);
-    };
-    /*
-    context.moveTo(10, 10);
-    context.lineTo(150, 50);
-    context.lineTo(10, 50);
-    context.fill();
-    context.stroke();
-    */
-    //context.fillText("Hello world",0,10);
-    // context2D.drawImage(image,0,0);
+    var myStage = new DisplayObjectContainer;
+    var img = new BitMap();
+    img.src = "S_Watcher.png";
+    myStage.addChild(img);
+    var tf1 = new TextField();
+    tf1.text = "Hello";
+    myStage.addChild(tf1);
+    var tf2 = new TextField();
+    tf2.text = "             World";
+    myStage.addChild(tf2);
+    setInterval(function () {
+        context2D.clearRect(0, 0, canvas.width, canvas.height);
+        myStage.draw(context2D);
+    }, 100);
 };
 //# sourceMappingURL=main.js.map
