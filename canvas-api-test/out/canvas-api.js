@@ -9,9 +9,20 @@ var DisplayObject = (function () {
         this.y = 0;
         this.scaleX = 1;
         this.scaleY = 1;
-        this.aplha = 1;
+        this.alpha = 1;
+        this.globalAlpha = 1;
     }
     DisplayObject.prototype.draw = function (_context) {
+        if (this.parent) {
+            this.globalAlpha = this.parent.globalAlpha * this.alpha;
+        }
+        else {
+            _context.globalAlpha = this.globalAlpha;
+        }
+        this.render(_context);
+    };
+    //模板方法模式
+    DisplayObject.prototype.render = function (_context) {
     };
     return DisplayObject;
 }());
@@ -32,8 +43,8 @@ var TextField = (function (_super) {
         this.isbold = false;
         this.isitalic = false;
     }
-    TextField.prototype.draw = function (_context) {
-        _context.globalAlpha = this.aplha;
+    TextField.prototype.render = function (_context) {
+        //不在这里处理_context.globalAlpha = this.alpha;
         if (this.isitalic) {
             this.font_Style = "italic ";
         }
@@ -56,20 +67,20 @@ var BitMap = (function (_super) {
     function BitMap() {
         _super.apply(this, arguments);
     }
-    BitMap.prototype.draw = function (_context) {
+    BitMap.prototype.render = function (_context) {
         var _this = this;
         if (this.bitmap_cache == null) {
             var image = new Image();
             image.src = this.src;
             image.onload = function () {
-                _context.globalAlpha = _this.aplha;
-                _context.scale(_this.scaleX, _this.scaleY);
+                //不在这里处理_context.globalAlpha = this.alpha;
+                //不在这里处理_context.scale(this.scaleX, this.scaleY);
                 _context.drawImage(image, _this.x, _this.y);
                 _this.bitmap_cache = image;
             };
         }
         else {
-            _context.globalAlpha = this.aplha;
+            //不在这里处理_context.globalAlpha = this.alpha;//绝对Alpha = 相对alpha * 其父绝对alpha
             //_context.scale(this.scaleX,this.scaleY);
             _context.drawImage(this.bitmap_cache, this.x, this.y);
         }
@@ -84,6 +95,7 @@ var DisplayObjectContainer = (function (_super) {
     }
     DisplayObjectContainer.prototype.addChild = function (_child) {
         this.array.push(_child);
+        _child.parent = this;
     };
     /*
         createBitmapByName(_src: string) {
@@ -95,7 +107,7 @@ var DisplayObjectContainer = (function (_super) {
             }
         }
     */
-    DisplayObjectContainer.prototype.draw = function (_context) {
+    DisplayObjectContainer.prototype.render = function (_context) {
         for (var _i = 0, _a = this.array; _i < _a.length; _i++) {
             var drawable = _a[_i];
             drawable.draw(_context);
