@@ -31,11 +31,9 @@ window.onload = function () {
     var myStage = new DisplayObjectContainer;
     var secondStage = new DisplayObjectContainer;
     secondStage.globalAlpha = 0.5;
+    secondStage.globalX = 10;
     var img = new BitMap();
     img.src = "S_Watcher.png";
-    //img.y = 20;
-    //img.scaleX = 0.5;
-    //img.scaleY = 0.5;
     secondStage.addChild(img);
     var tf1 = new TextField();
     tf1.text = "Hello";
@@ -43,7 +41,6 @@ window.onload = function () {
     tf1.textColor = "#0000FF";
     tf1.isitalic = true;
     tf1.size = 17;
-    //tf1.alpha = 0.4;
     secondStage.addChild(tf1);
     var tf2 = new TextField();
     tf2.text = "                World";

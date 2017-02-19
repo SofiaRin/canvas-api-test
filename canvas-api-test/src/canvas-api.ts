@@ -5,23 +5,54 @@ interface Drawable {
 
 class DisplayObject implements Drawable {
     x = 0;
+    globalX = 0;
+
     y = 0;
+    globalY = 0;
+
+    selfMatrix: math.Matrix;
+
+    globalMatrix: math.Matrix;
+
     width: number
     height: number
     scaleX = 1;
+    globalscaleX = 1;
+
     scaleY = 1;
+    globalscaleY = 1;
+
     alpha = 1;
     globalAlpha = 1;
 
+    rotation: number = 0;
+
     parent: DisplayObjectContainer;
+    constructor() {
+        this.selfMatrix = new math.Matrix();
+        this.globalMatrix = new math.Matrix();
+    }
 
     draw(_context: CanvasRenderingContext2D) {
+        ///context绘图前复位//封装的API不直接处理 a b c d tx ty 所以在update前，相当于将_context复位
+
+
+        this.globalMatrix.updateFromDisplayObject(this.globalX, this.globalY, this.globalscaleX, this.globalscaleY, this.rotation)
+
         if (this.parent) {
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
+            this.globalMatrix = math.matrixAppendMatrix(this.parent.globalMatrix, this.selfMatrix)
         } else {
+
             _context.globalAlpha = this.globalAlpha;
+            //_context.rotate
         }
+        
+        _context.translate(this.globalMatrix.tx, this.globalMatrix.ty);
+        _context.scale(this.globalMatrix.a, this.globalMatrix.d);
         this.render(_context);
+        _context.translate(-this.globalMatrix.tx, -this.globalMatrix.ty);
+        _context.scale(1, 1);
     }
     //模板方法模式
 
@@ -29,10 +60,7 @@ class DisplayObject implements Drawable {
 
     }
 }
-class Shape extends DisplayObject {
 
-
-}
 class TextField extends DisplayObject {
     text: string;
     textColor: string = "#FF00FF";
@@ -79,14 +107,11 @@ class BitMap extends DisplayObject {
             image.src = this.src;
 
             image.onload = () => {
-                //不在这里处理_context.globalAlpha = this.alpha;
-                //不在这里处理_context.scale(this.scaleX, this.scaleY);
                 _context.drawImage(image, this.x, this.y);
                 this.bitmap_cache = image;
             }
         } else {
-            //不在这里处理_context.globalAlpha = this.alpha;//绝对Alpha = 相对alpha * 其父绝对alpha
-            //_context.scale(this.scaleX,this.scaleY);
+
             _context.drawImage(this.bitmap_cache, this.x, this.y);
         }
 
@@ -101,16 +126,6 @@ class DisplayObjectContainer extends DisplayObject {
         this.array.push(_child);
         _child.parent = this;
     }
-    /*
-        createBitmapByName(_src: string) {
-            var image = new Image();
-            image.src = _src;
-            image.onload = () => {
-    
-                return image;
-            }
-        }
-    */
     render(_context: CanvasRenderingContext2D) {
 
         for (let drawable of this.array) {

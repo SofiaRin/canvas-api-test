@@ -6,33 +6,40 @@ var __extends = (this && this.__extends) || function (d, b) {
 var DisplayObject = (function () {
     function DisplayObject() {
         this.x = 0;
+        this.globalX = 0;
         this.y = 0;
+        this.globalY = 0;
         this.scaleX = 1;
+        this.globalscaleX = 1;
         this.scaleY = 1;
+        this.globalscaleY = 1;
         this.alpha = 1;
         this.globalAlpha = 1;
+        this.rotation = 0;
+        this.selfMatrix = new math.Matrix();
+        this.globalMatrix = new math.Matrix();
     }
     DisplayObject.prototype.draw = function (_context) {
+        ///context绘图前复位//封装的API不直接处理 a b c d tx ty 所以在update前，相当于将_context复位
+        this.globalMatrix.updateFromDisplayObject(this.globalX, this.globalY, this.globalscaleX, this.globalscaleY, this.rotation);
         if (this.parent) {
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
+            this.globalMatrix = math.matrixAppendMatrix(this.parent.globalMatrix, this.selfMatrix);
         }
         else {
             _context.globalAlpha = this.globalAlpha;
         }
+        _context.translate(this.globalMatrix.tx, this.globalMatrix.ty);
+        _context.scale(this.globalMatrix.a, this.globalMatrix.d);
         this.render(_context);
+        _context.translate(-this.globalMatrix.tx, -this.globalMatrix.ty);
+        _context.scale(1, 1);
     };
     //模板方法模式
     DisplayObject.prototype.render = function (_context) {
     };
     return DisplayObject;
 }());
-var Shape = (function (_super) {
-    __extends(Shape, _super);
-    function Shape() {
-        _super.apply(this, arguments);
-    }
-    return Shape;
-}(DisplayObject));
 var TextField = (function (_super) {
     __extends(TextField, _super);
     function TextField() {
@@ -73,15 +80,11 @@ var BitMap = (function (_super) {
             var image = new Image();
             image.src = this.src;
             image.onload = function () {
-                //不在这里处理_context.globalAlpha = this.alpha;
-                //不在这里处理_context.scale(this.scaleX, this.scaleY);
                 _context.drawImage(image, _this.x, _this.y);
                 _this.bitmap_cache = image;
             };
         }
         else {
-            //不在这里处理_context.globalAlpha = this.alpha;//绝对Alpha = 相对alpha * 其父绝对alpha
-            //_context.scale(this.scaleX,this.scaleY);
             _context.drawImage(this.bitmap_cache, this.x, this.y);
         }
     };
@@ -97,16 +100,6 @@ var DisplayObjectContainer = (function (_super) {
         this.array.push(_child);
         _child.parent = this;
     };
-    /*
-        createBitmapByName(_src: string) {
-            var image = new Image();
-            image.src = _src;
-            image.onload = () => {
-    
-                return image;
-            }
-        }
-    */
     DisplayObjectContainer.prototype.render = function (_context) {
         for (var _i = 0, _a = this.array; _i < _a.length; _i++) {
             var drawable = _a[_i];
