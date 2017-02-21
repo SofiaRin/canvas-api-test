@@ -32,10 +32,15 @@ window.onload = () => {
 
     var myStage = new DisplayObjectContainer;
     var secondStage = new DisplayObjectContainer;
-
+    /*
+    API test with secondStage
+    */
     secondStage.globalAlpha = 0.5;
     secondStage.globalX = 10;
-
+    secondStage.globalscaleX = 0.5;
+    secondStage.globalscaleY = 0.5;
+    
+    secondStage.rotation = 15;
 
     var img = new BitMap();
     img.src = "S_Watcher.png";

@@ -34,11 +34,9 @@ class DisplayObject implements Drawable {
     }
 
     draw(_context: CanvasRenderingContext2D) {
-        ///context绘图前复位//封装的API不直接处理 a b c d tx ty 所以在update前，相当于将_context复位
-
-
+        
         this.globalMatrix.updateFromDisplayObject(this.globalX, this.globalY, this.globalscaleX, this.globalscaleY, this.rotation)
-
+        //selfMatrix不进行更新，是因为他遵守默认值？
         if (this.parent) {
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
             this.globalMatrix = math.matrixAppendMatrix(this.parent.globalMatrix, this.selfMatrix)
@@ -47,12 +45,20 @@ class DisplayObject implements Drawable {
             _context.globalAlpha = this.globalAlpha;
             //_context.rotate
         }
+        _context.setTransform(this.globalMatrix.a,this.globalMatrix.b,
+        this.globalMatrix.c,this.globalMatrix.d,
+        this.globalMatrix.tx,this.globalMatrix.ty);
+       
+        //_context.scale(this.globalMatrix.a, this.globalMatrix.d);
+        //_context.translate(this.globalMatrix.tx, this.globalMatrix.ty);
         
-        _context.translate(this.globalMatrix.tx, this.globalMatrix.ty);
-        _context.scale(this.globalMatrix.a, this.globalMatrix.d);
         this.render(_context);
-        _context.translate(-this.globalMatrix.tx, -this.globalMatrix.ty);
-        _context.scale(1, 1);
+        ///context绘图前复位//封装的API不直接处理 a b c d tx ty 所以在update前，相当于将_context复位
+        //*render 结束后进行复位
+        //_context.scale(1/this.globalMatrix.a, 1/this.globalMatrix.d);
+        //_context.translate(-this.globalMatrix.tx, -this.globalMatrix.ty);
+        
+
     }
     //模板方法模式
 

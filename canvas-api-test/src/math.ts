@@ -102,6 +102,7 @@ module math {
 
             var u = Math.cos(skewX);
             var v = Math.sin(skewX);
+            
             this.a = Math.cos(skewY) * scaleX;
             this.b = Math.sin(skewY) * scaleX;
             this.c = -v * scaleY;
