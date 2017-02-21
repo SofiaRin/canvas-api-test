@@ -94,7 +94,7 @@ module math {
             return "(a=" + this.a + ", b=" + this.b + ", c=" + this.c + ", d=" + this.d + ", tx=" + this.tx + ", ty=" + this.ty + ")";
         }
 
-        updateFromDisplayObject(x: number, y: number, scaleX: number, scaleY: number, rotation: number) {
+        updateFromDisplayObject(x: number, y: number, scaleX: number, scaleY: number, rotation:number) {
             this.tx = x;
             this.ty = y;
             var skewX, skewY;
@@ -108,6 +108,11 @@ module math {
             this.c = -v * scaleY;
             this.d = u * scaleY;
 
+        }
+
+        updateSkewMatrix(b:number,c:number){
+            this.b = b;
+            this.c = c;
         }
     }
 }

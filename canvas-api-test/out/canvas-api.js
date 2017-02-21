@@ -16,12 +16,24 @@ var DisplayObject = (function () {
         this.alpha = 1;
         this.globalAlpha = 1;
         this.rotation = 0;
+        this.skewX = 0;
+        this.skewY = 0;
         this.selfMatrix = new math.Matrix();
         this.globalMatrix = new math.Matrix();
+        this.skewMatrix = new math.Matrix();
     }
+    DisplayObject.prototype.setSkewX = function (_skewX) {
+        this.skewX = _skewX;
+    };
+    DisplayObject.prototype.setSkewY = function (_skewY) {
+        this.skewY = _skewY;
+    };
     DisplayObject.prototype.draw = function (_context) {
         this.globalMatrix.updateFromDisplayObject(this.globalX, this.globalY, this.globalscaleX, this.globalscaleY, this.rotation);
-        //selfMatrix不进行更新，是因为他遵守默认值？
+        this.skewMatrix.updateSkewMatrix(this.skewX, this.skewY);
+        var temp = new math.Matrix();
+        temp = this.globalMatrix;
+        this.globalMatrix = math.matrixAppendMatrix(temp, this.skewMatrix);
         if (this.parent) {
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
             this.globalMatrix = math.matrixAppendMatrix(this.parent.globalMatrix, this.selfMatrix);
@@ -30,13 +42,7 @@ var DisplayObject = (function () {
             _context.globalAlpha = this.globalAlpha;
         }
         _context.setTransform(this.globalMatrix.a, this.globalMatrix.b, this.globalMatrix.c, this.globalMatrix.d, this.globalMatrix.tx, this.globalMatrix.ty);
-        //_context.scale(this.globalMatrix.a, this.globalMatrix.d);
-        //_context.translate(this.globalMatrix.tx, this.globalMatrix.ty);
         this.render(_context);
-        ///context绘图前复位//封装的API不直接处理 a b c d tx ty 所以在update前，相当于将_context复位
-        //*render 结束后进行复位
-        //_context.scale(1/this.globalMatrix.a, 1/this.globalMatrix.d);
-        //_context.translate(-this.globalMatrix.tx, -this.globalMatrix.ty);
     };
     //模板方法模式
     DisplayObject.prototype.render = function (_context) {
@@ -54,7 +60,6 @@ var TextField = (function (_super) {
         this.isitalic = false;
     }
     TextField.prototype.render = function (_context) {
-        //不在这里处理_context.globalAlpha = this.alpha;
         if (this.isitalic) {
             this.font_Style = "italic ";
         }

@@ -86,6 +86,10 @@ var math;
             this.c = -v * scaleY;
             this.d = u * scaleY;
         };
+        Matrix.prototype.updateSkewMatrix = function (b, c) {
+            this.b = b;
+            this.c = c;
+        };
         return Matrix;
     }());
     math.Matrix = Matrix;

@@ -35,9 +35,11 @@ window.onload = function () {
     */
     secondStage.globalAlpha = 0.5;
     secondStage.globalX = 10;
-    secondStage.globalscaleX = 0.5;
-    secondStage.globalscaleY = 0.5;
-    secondStage.rotation = 15;
+    //secondStage.globalscaleX = 0.5;
+    //secondStage.globalscaleY = 0.5;
+    secondStage.rotation = 5;
+    secondStage.setSkewX(1);
+    secondStage.setSkewY(2);
     var img = new BitMap();
     img.src = "S_Watcher.png";
     secondStage.addChild(img);
