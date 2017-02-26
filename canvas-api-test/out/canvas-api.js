@@ -76,6 +76,17 @@ var TextField = (function (_super) {
         _context.fillText(this.text, this.x, this.y + 15);
     };
     TextField.prototype.hitTest = function (_relativeX, _relativeY) {
+        var testRect = new math.Rectangle(0, 0, 10 * this.text.length, 20);
+        var checkPoint = new math.Point(_relativeX, _relativeY);
+        if (testRect.isPointInRectangle(checkPoint)) {
+            console.log(this.name);
+            alert(true);
+            return this;
+        }
+        else {
+            alert(false);
+            return null;
+        }
     };
     return TextField;
 }(DisplayObject));
@@ -109,12 +120,13 @@ var BitMap = (function (_super) {
         var testRect = new math.Rectangle(0, 0, this.bitmap_cache.width, this.bitmap_cache.height);
         var checkPoint = new math.Point(_relativeX, _relativeY);
         if (testRect.isPointInRectangle(checkPoint)) {
-            console.log(this);
+            console.log("reaction " + this.name);
             alert(true);
             return this;
         }
         else {
             alert(false);
+            console.log("no reaction " + this.name);
             return null;
         }
     };

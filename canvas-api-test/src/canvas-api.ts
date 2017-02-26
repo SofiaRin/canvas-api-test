@@ -4,6 +4,7 @@ interface Drawable {
 }
 
 abstract class DisplayObject implements Drawable {
+    name:string;
     x = 0;
     globalX = 0;
 
@@ -129,8 +130,19 @@ class TextField extends DisplayObject {
     }
 
     hitTest(_relativeX: number, _relativeY: number) {
+        var testRect = new math.Rectangle(0,0,10 * this.text.length,20);
+        var checkPoint = new math.Point(_relativeX,_relativeY);  
+        if (testRect.isPointInRectangle(checkPoint)) {
+            console.log(this.name);
+            alert(true);
+            return this;
 
 
+        } else {
+
+            alert(false);
+            return null;
+        }
     }
 
 
@@ -170,7 +182,7 @@ class BitMap extends DisplayObject {
         var checkPoint = new math.Point(_relativeX, _relativeY);
 
         if (testRect.isPointInRectangle(checkPoint)) {
-            console.log(this);
+            console.log("reaction " + this.name);
             alert(true);
             return this;
 
@@ -178,6 +190,7 @@ class BitMap extends DisplayObject {
         } else {
 
             alert(false);
+            console.log("no reaction " + this.name)
             return null;
         }
 

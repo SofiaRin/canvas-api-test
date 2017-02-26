@@ -1,44 +1,45 @@
-/*
-class Greeter {
-    element: HTMLElement;
-    span: HTMLElement;
-    timerToken: number;
-
-    constructor(element: HTMLElement) {
-        this.element = element;
-        this.element.innerHTML += "The time is: ";
-        this.span = document.createElement('span');
-        this.element.appendChild(this.span);
-        this.span.innerText = new Date().toUTCString();
-    }
-
-    start() {
-        this.timerToken = setInterval(() => this.span.innerHTML = new Date().toUTCString(), 500);
-    }
-
-    stop() {
-        clearTimeout(this.timerToken);
-    }
-
-}
-*/
-//B的全局矩阵 = B的自己矩阵（相对矩阵） * 其父的全局矩阵
 window.onload = function () {
     var canvas = document.getElementById('test_canvas');
     var context2D = canvas.getContext("2d");
     // context2D.fillStyle = "#0000FF";
     context2D.strokeStyle = "#FF0000";
     var myStage = new DisplayObjectContainer;
-    var secondStage = new DisplayObjectContainer;
+    var itemRender = new DisplayObjectContainer;
+    var itemBg_0 = new BitMap();
+    itemBg_0.src = "bg.gif";
+    itemBg_0.name = "itemBg_0";
+    itemRender.addChild(itemBg_0);
+    var itemButton_0 = new BitMap();
+    itemButton_0.src = "button.gif";
+    itemButton_0.name = "itemButton_0";
+    itemRender.addChild(itemButton_0);
+    var itemBg_1 = new BitMap();
+    itemBg_1.src = "bg.gif";
+    itemBg_1.name = "itemBg_1";
+    itemRender.addChild(itemBg_1);
+    var itemButton_1 = new BitMap();
+    itemButton_1.src = "button.gif";
+    itemButton_1.name = "itemButton_1";
+    itemRender.addChild(itemButton_1);
+    itemBg_1.y = itemButton_1.y = 200;
+    var itemBg_2 = new BitMap();
+    itemBg_2.src = "bg.gif";
+    itemBg_2.name = "itemBg_2";
+    itemRender.addChild(itemBg_2);
+    var itemButton_2 = new BitMap();
+    itemButton_2.src = "button.gif";
+    itemButton_2.name = "itemButton_2";
+    itemRender.addChild(itemButton_2);
+    itemBg_2.y = itemButton_2.y = 400;
     /*
     API test with secondStage
     */
-    secondStage.globalAlpha = 1;
-    secondStage.scaleX = 0.5;
-    secondStage.scaleY = 0.5;
+    /*
     var img = new BitMap();
     img.src = "S_Watcher.png";
     secondStage.addChild(img);
+
+
     var tf1 = new TextField();
     tf1.text = "Hello";
     tf1.font_family = "Arial";
@@ -46,19 +47,22 @@ window.onload = function () {
     tf1.isitalic = true;
     tf1.size = 17;
     secondStage.addChild(tf1);
+
+
     var tf2 = new TextField();
     tf2.text = "                World";
     tf2.font_family = "Microsoft YaHei";
     tf2.isbold = true;
     tf2.size = 15;
     secondStage.addChild(tf2);
-    myStage.addChild(secondStage);
+*/
+    myStage.addChild(itemRender);
     window.onmousedown = function (e) {
         var x = e.offsetX - 16;
-        var y = e.offsetY - 16;
+        var y = e.offsetY - 32;
         console.log(x, y);
         var type = "mousedown";
-        var target = secondStage.hitTest(x, y);
+        var target = itemRender.hitTest(x, y);
         var result = target;
         if (result) {
             while (result.parent) {
@@ -70,8 +74,8 @@ window.onload = function () {
     };
     setInterval(function () {
         context2D.clearRect(0, 0, canvas.width, canvas.height);
-        //secondStage.draw(context2D);
         myStage.draw(context2D);
+        itemRender.y--;
     }, 100);
 };
 //# sourceMappingURL=main.js.map
