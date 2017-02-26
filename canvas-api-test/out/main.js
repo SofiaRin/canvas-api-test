@@ -33,13 +33,9 @@ window.onload = function () {
     /*
     API test with secondStage
     */
-    secondStage.globalAlpha = 0.5;
-    secondStage.globalX = 10;
-    //secondStage.globalscaleX = 0.5;
-    //secondStage.globalscaleY = 0.5;
-    secondStage.rotation = 5;
-    secondStage.setSkewX(1);
-    secondStage.setSkewY(2);
+    secondStage.globalAlpha = 1;
+    secondStage.scaleX = 0.5;
+    secondStage.scaleY = 0.5;
     var img = new BitMap();
     img.src = "S_Watcher.png";
     secondStage.addChild(img);
@@ -56,10 +52,26 @@ window.onload = function () {
     tf2.isbold = true;
     tf2.size = 15;
     secondStage.addChild(tf2);
+    myStage.addChild(secondStage);
+    window.onmousedown = function (e) {
+        var x = e.offsetX - 16;
+        var y = e.offsetY - 16;
+        console.log(x, y);
+        var type = "mousedown";
+        var target = secondStage.hitTest(x, y);
+        var result = target;
+        if (result) {
+            while (result.parent) {
+                var currentTarget = result.parent;
+                var e_1 = { type: type, target: target, currentTarget: currentTarget };
+                result = result.parent;
+            }
+        }
+    };
     setInterval(function () {
         context2D.clearRect(0, 0, canvas.width, canvas.height);
-        //myStage.draw(context2D);
-        secondStage.draw(context2D);
+        //secondStage.draw(context2D);
+        myStage.draw(context2D);
     }, 100);
 };
 //# sourceMappingURL=main.js.map

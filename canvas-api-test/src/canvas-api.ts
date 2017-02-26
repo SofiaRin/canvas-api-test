@@ -3,7 +3,7 @@ interface Drawable {
     render(_context: CanvasRenderingContext2D);
 }
 
-class DisplayObject implements Drawable {
+abstract class DisplayObject implements Drawable {
     x = 0;
     globalX = 0;
 
@@ -27,8 +27,8 @@ class DisplayObject implements Drawable {
     alpha = 1;
     globalAlpha = 1;
 
-    rotation: number = 0;
-
+    globalrotation: number = 0;
+    rotation = 0
 
     skewX = 0;
     skewY = 0;
@@ -52,11 +52,15 @@ class DisplayObject implements Drawable {
     draw(_context: CanvasRenderingContext2D) {
 
         this.globalMatrix.updateFromDisplayObject(this.globalX, this.globalY,
-            this.globalscaleX, this.globalscaleY, this.rotation);
+            this.globalscaleX, this.globalscaleY, this.globalrotation);
+        this.selfMatrix.updateFromDisplayObject(this.x, this.y,
+            this.scaleX, this.scaleY, this.rotation);
+
+
 
         this.skewMatrix.updateSkewMatrix(this.skewX, this.skewY);
 
-      
+
         var temp = new math.Matrix();
         temp = this.globalMatrix;
 
@@ -64,30 +68,33 @@ class DisplayObject implements Drawable {
 
         if (this.parent) {
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
-            this.globalMatrix = math.matrixAppendMatrix(this.parent.globalMatrix, this.selfMatrix);
+            //B的全局矩阵 = B的自己矩阵（相对矩阵） * 其父的全局矩阵
+            this.globalMatrix = math.matrixAppendMatrix(this.selfMatrix, this.parent.globalMatrix);
 
 
         } else {
 
             _context.globalAlpha = this.globalAlpha;
-           
+
         }
         _context.setTransform(this.globalMatrix.a, this.globalMatrix.b,
             this.globalMatrix.c, this.globalMatrix.d,
             this.globalMatrix.tx, this.globalMatrix.ty);
 
-       
+
 
         this.render(_context);
-     
+
 
 
     }
     //模板方法模式
 
-    render(_context: CanvasRenderingContext2D) {
+    abstract render(_context: CanvasRenderingContext2D)
 
-    }
+    abstract hitTest(relativeX: number, relativeY: number);
+
+
 }
 
 class TextField extends DisplayObject {
@@ -100,7 +107,7 @@ class TextField extends DisplayObject {
     isitalic: boolean = false;
     font_Style: string;
     render(_context: CanvasRenderingContext2D) {
-        
+
 
         if (this.isitalic) {
             this.font_Style = "italic ";
@@ -121,6 +128,11 @@ class TextField extends DisplayObject {
 
     }
 
+    hitTest(_relativeX: number, _relativeY: number) {
+
+
+    }
+
 
 }
 
@@ -129,7 +141,13 @@ class BitMap extends DisplayObject {
 
     bitmap_cache: HTMLImageElement;
 
-
+    image: HTMLImageElement;
+    /*
+    constructor(){
+        super();
+        this.image
+    }
+    */
     render(_context: CanvasRenderingContext2D) {
         if (this.bitmap_cache == null) {
             var image = new Image();
@@ -138,6 +156,7 @@ class BitMap extends DisplayObject {
             image.onload = () => {
                 _context.drawImage(image, this.x, this.y);
                 this.bitmap_cache = image;
+                //console.log(this.bitmap_cache.width, this.bitmap_cache.height);
             }
         } else {
 
@@ -145,6 +164,29 @@ class BitMap extends DisplayObject {
         }
 
     }
+
+    hitTest(_relativeX: number, _relativeY: number) {
+        var testRect = new math.Rectangle(0, 0, this.bitmap_cache.width, this.bitmap_cache.height);
+        var checkPoint = new math.Point(_relativeX, _relativeY);
+
+        if (testRect.isPointInRectangle(checkPoint)) {
+            console.log(this);
+            alert(true);
+            return this;
+
+
+        } else {
+
+            alert(false);
+            return null;
+        }
+
+
+
+
+
+    }
+
 }
 
 class DisplayObjectContainer extends DisplayObject {
@@ -157,9 +199,37 @@ class DisplayObjectContainer extends DisplayObject {
     }
     render(_context: CanvasRenderingContext2D) {
 
-        for (let drawable of this.array) {
+        for (let child of this.array) {
 
-            drawable.draw(_context);
+            child.draw(_context);
         }
     }
+
+    hitTest(_relativeX: number, _relativeY: number) {
+
+
+        for (var i = this.array.length - 1; i >= 0; i--) {
+            let child = this.array[i];
+            let tempPoint = new math.Point(_relativeX, _relativeY);
+            //
+            let invertMatrix = math.invertMatrix(child.globalMatrix);
+            //没有计算过他的相对矩阵,计算一个矩阵的相对矩阵
+            //inv this.array[i].selfMatrix
+            let relativePoint = math.pointAppendMatrix(tempPoint, invertMatrix);
+
+            console.log(relativePoint.x, relativePoint.y);
+            //   _relativepoint * inv
+            //  resule
+            let result = child.hitTest(relativePoint.x, relativePoint.y);
+            if (result) {
+
+                return  result;
+            }
+
+        }
+        return null
+
+    }
+
+
 }

@@ -15,6 +15,7 @@ var DisplayObject = (function () {
         this.globalscaleY = 1;
         this.alpha = 1;
         this.globalAlpha = 1;
+        this.globalrotation = 0;
         this.rotation = 0;
         this.skewX = 0;
         this.skewY = 0;
@@ -29,23 +30,22 @@ var DisplayObject = (function () {
         this.skewY = _skewY;
     };
     DisplayObject.prototype.draw = function (_context) {
-        this.globalMatrix.updateFromDisplayObject(this.globalX, this.globalY, this.globalscaleX, this.globalscaleY, this.rotation);
+        this.globalMatrix.updateFromDisplayObject(this.globalX, this.globalY, this.globalscaleX, this.globalscaleY, this.globalrotation);
+        this.selfMatrix.updateFromDisplayObject(this.x, this.y, this.scaleX, this.scaleY, this.rotation);
         this.skewMatrix.updateSkewMatrix(this.skewX, this.skewY);
         var temp = new math.Matrix();
         temp = this.globalMatrix;
         this.globalMatrix = math.matrixAppendMatrix(temp, this.skewMatrix);
         if (this.parent) {
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
-            this.globalMatrix = math.matrixAppendMatrix(this.parent.globalMatrix, this.selfMatrix);
+            //B的全局矩阵 = B的自己矩阵（相对矩阵） * 其父的全局矩阵
+            this.globalMatrix = math.matrixAppendMatrix(this.selfMatrix, this.parent.globalMatrix);
         }
         else {
             _context.globalAlpha = this.globalAlpha;
         }
         _context.setTransform(this.globalMatrix.a, this.globalMatrix.b, this.globalMatrix.c, this.globalMatrix.d, this.globalMatrix.tx, this.globalMatrix.ty);
         this.render(_context);
-    };
-    //模板方法模式
-    DisplayObject.prototype.render = function (_context) {
     };
     return DisplayObject;
 }());
@@ -75,6 +75,8 @@ var TextField = (function (_super) {
         _context.fillStyle = this.textColor;
         _context.fillText(this.text, this.x, this.y + 15);
     };
+    TextField.prototype.hitTest = function (_relativeX, _relativeY) {
+    };
     return TextField;
 }(DisplayObject));
 var BitMap = (function (_super) {
@@ -82,6 +84,12 @@ var BitMap = (function (_super) {
     function BitMap() {
         _super.apply(this, arguments);
     }
+    /*
+    constructor(){
+        super();
+        this.image
+    }
+    */
     BitMap.prototype.render = function (_context) {
         var _this = this;
         if (this.bitmap_cache == null) {
@@ -90,10 +98,24 @@ var BitMap = (function (_super) {
             image.onload = function () {
                 _context.drawImage(image, _this.x, _this.y);
                 _this.bitmap_cache = image;
+                //console.log(this.bitmap_cache.width, this.bitmap_cache.height);
             };
         }
         else {
             _context.drawImage(this.bitmap_cache, this.x, this.y);
+        }
+    };
+    BitMap.prototype.hitTest = function (_relativeX, _relativeY) {
+        var testRect = new math.Rectangle(0, 0, this.bitmap_cache.width, this.bitmap_cache.height);
+        var checkPoint = new math.Point(_relativeX, _relativeY);
+        if (testRect.isPointInRectangle(checkPoint)) {
+            console.log(this);
+            alert(true);
+            return this;
+        }
+        else {
+            alert(false);
+            return null;
         }
     };
     return BitMap;
@@ -110,9 +132,28 @@ var DisplayObjectContainer = (function (_super) {
     };
     DisplayObjectContainer.prototype.render = function (_context) {
         for (var _i = 0, _a = this.array; _i < _a.length; _i++) {
-            var drawable = _a[_i];
-            drawable.draw(_context);
+            var child = _a[_i];
+            child.draw(_context);
         }
+    };
+    DisplayObjectContainer.prototype.hitTest = function (_relativeX, _relativeY) {
+        for (var i = this.array.length - 1; i >= 0; i--) {
+            var child = this.array[i];
+            var tempPoint = new math.Point(_relativeX, _relativeY);
+            //
+            var invertMatrix = math.invertMatrix(child.globalMatrix);
+            //没有计算过他的相对矩阵,计算一个矩阵的相对矩阵
+            //inv this.array[i].selfMatrix
+            var relativePoint = math.pointAppendMatrix(tempPoint, invertMatrix);
+            console.log(relativePoint.x, relativePoint.y);
+            //   _relativepoint * inv
+            //  resule
+            var result = child.hitTest(relativePoint.x, relativePoint.y);
+            if (result) {
+                return result;
+            }
+        }
+        return null;
     };
     return DisplayObjectContainer;
 }(DisplayObject));
