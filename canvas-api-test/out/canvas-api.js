@@ -47,6 +47,32 @@ var DisplayObject = (function () {
         _context.setTransform(this.globalMatrix.a, this.globalMatrix.b, this.globalMatrix.c, this.globalMatrix.d, this.globalMatrix.tx, this.globalMatrix.ty);
         this.render(_context);
     };
+    DisplayObject.prototype.addEventListener = function (type, func, capture) {
+        var event = new TouchListener(type, func, capture);
+        this.listeners.push(event);
+    };
+    DisplayObject.prototype.dispatchEvent = function (isCapture, chain, event) {
+        /*
+        if (chain) {
+            var transformedChain = chain.slice(0);
+            if (!isCapture) {
+                transformedChain.reverse();
+            }
+            for (var i = 0; i < transformedChain.length; i++) {//逆向遍历点击事件链的元素
+                var element = transformedChain[i];
+                element.listeners.forEach((value) => {//每个元素派发事件
+                    var t = (type == "capture") ? value.capture : !value.capture;
+                    if (value.type == event.type && t) {
+                        //value.obj.func();todo更新func调用
+                        value.func();
+                    }
+                });
+            }
+        } else
+            console.log("no chain");
+    }
+    */
+    };
     return DisplayObject;
 }());
 var TextField = (function (_super) {
@@ -80,7 +106,7 @@ var TextField = (function (_super) {
         var checkPoint = new math.Point(_relativeX, _relativeY);
         if (testRect.isPointInRectangle(checkPoint)) {
             console.log(this.name);
-            alert(true);
+            console.log(true);
             return this;
         }
         else {
@@ -121,11 +147,11 @@ var BitMap = (function (_super) {
         var checkPoint = new math.Point(_relativeX, _relativeY);
         if (testRect.isPointInRectangle(checkPoint)) {
             console.log("reaction " + this.name);
-            alert(true);
+            //alert(true);
             return this;
         }
         else {
-            alert(false);
+            //alert(false);
             console.log("no reaction " + this.name);
             return null;
         }

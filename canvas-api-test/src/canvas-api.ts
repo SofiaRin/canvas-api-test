@@ -4,7 +4,7 @@ interface Drawable {
 }
 
 abstract class DisplayObject implements Drawable {
-    name:string;
+    name: string;
     x = 0;
     globalX = 0;
 
@@ -34,10 +34,12 @@ abstract class DisplayObject implements Drawable {
     skewX = 0;
     skewY = 0;
     parent: DisplayObjectContainer;
+    eventList:MyEvent[] = [];
     constructor() {
         this.selfMatrix = new math.Matrix();
         this.globalMatrix = new math.Matrix();
         this.skewMatrix = new math.Matrix();
+
     }
     setSkewX(_skewX: number) {
         this.skewX = _skewX;
@@ -57,10 +59,7 @@ abstract class DisplayObject implements Drawable {
         this.selfMatrix.updateFromDisplayObject(this.x, this.y,
             this.scaleX, this.scaleY, this.rotation);
 
-
-
         this.skewMatrix.updateSkewMatrix(this.skewX, this.skewY);
-
 
         var temp = new math.Matrix();
         temp = this.globalMatrix;
@@ -81,13 +80,7 @@ abstract class DisplayObject implements Drawable {
         _context.setTransform(this.globalMatrix.a, this.globalMatrix.b,
             this.globalMatrix.c, this.globalMatrix.d,
             this.globalMatrix.tx, this.globalMatrix.ty);
-
-
-
         this.render(_context);
-
-
-
     }
     //模板方法模式
 
@@ -95,7 +88,11 @@ abstract class DisplayObject implements Drawable {
 
     abstract hitTest(relativeX: number, relativeY: number);
 
+    addEventListener(_type: number, _func: Function, _isCapture: boolean, _target: DisplayObject) {
+        let event = new MyEvent(_type,_func,_isCapture,_target);
+        this.eventList.push(event);
 
+    }
 }
 
 class TextField extends DisplayObject {
@@ -130,11 +127,11 @@ class TextField extends DisplayObject {
     }
 
     hitTest(_relativeX: number, _relativeY: number) {
-        var testRect = new math.Rectangle(0,0,10 * this.text.length,20);
-        var checkPoint = new math.Point(_relativeX,_relativeY);  
+        var testRect = new math.Rectangle(0, 0, 10 * this.text.length, 20);
+        var checkPoint = new math.Point(_relativeX, _relativeY);
         if (testRect.isPointInRectangle(checkPoint)) {
             console.log(this.name);
-            alert(true);
+            console.log(true);
             return this;
 
 
@@ -183,13 +180,13 @@ class BitMap extends DisplayObject {
 
         if (testRect.isPointInRectangle(checkPoint)) {
             console.log("reaction " + this.name);
-            alert(true);
+            //alert(true);
             return this;
 
 
         } else {
 
-            alert(false);
+            //alert(false);
             console.log("no reaction " + this.name)
             return null;
         }
@@ -236,7 +233,7 @@ class DisplayObjectContainer extends DisplayObject {
             let result = child.hitTest(relativePoint.x, relativePoint.y);
             if (result) {
 
-                return  result;
+                return result;
             }
 
         }

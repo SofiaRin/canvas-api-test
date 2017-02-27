@@ -26,19 +26,9 @@ window.onload = () => {
     itemButton_1.src = "button.gif";
     itemButton_1.name = "itemButton_1"
     itemRender.addChild(itemButton_1);
-    itemBg_1.y = itemButton_1.y = 200;
+    itemBg_1.y = itemButton_1.y = 100;
 
-    
-    var itemBg_2 = new BitMap();
-    itemBg_2.src = "bg.gif";
-    itemBg_2.name = "itemBg_2"
-    itemRender.addChild(itemBg_2);
-    var itemButton_2 = new BitMap();
-    itemButton_2.src = "button.gif";
-    itemButton_2.name = "itemButton_2"
-    itemRender.addChild(itemButton_2);
-    itemBg_2.y = itemButton_2.y = 400;
-    
+
     /*
     API test with secondStage
     */
@@ -66,29 +56,77 @@ window.onload = () => {
 */
 
     myStage.addChild(itemRender);
+    var init_TouchPointY;
+    var checkDownResult;
+    var isMouseDown = false;
+    var moveDistance;
+
+    window.onmousedown = (mouseDownEvent) => {
+        isMouseDown = true;
+        let downX = mouseDownEvent.offsetX - 16;
+        let downY = init_TouchPointY = mouseDownEvent.offsetY - 16;
+        console.log(downX, downY);
 
 
-    window.onmousedown = (e) => {
-        let x = e.offsetX -16;
-        let y = e.offsetY -32;
-        console.log(x, y);
         let type = "mousedown";
-        let target = itemRender.hitTest(x, y);
-        let result = target;
-        if (result) {
-            while (result.parent) {
-                let currentTarget = result.parent;
-                let e = { type, target, currentTarget };
+        let downTarget = itemRender.hitTest(downX, downY);
+        let downResult = downTarget;
+        if (downResult) {
+            /*
+            while (downResult.parent) {
+                let currentTarget = downResult.parent;
+                let e = { type, downTarget, currentTarget };
+ 
+                downResult = downResult.parent;
+                */
+            checkDownResult = downTarget;
+        }
 
-                result = result.parent;
+    }
+
+
+    window.onmouseup = (mouseUpEvent) => {
+
+        let upX = mouseUpEvent.offsetX - 16;
+        let upY = mouseUpEvent.offsetY - 16;
+        console.log("up: " + upX, "up: " + upY);
+        let type = "mouseup";
+        let upTarget = itemRender.hitTest(upX, upY);
+        let upResult = upTarget;
+        if (upResult) {
+
+            if (checkDownResult == upResult) {//对比
+
+                alert("one click");
+                console.log("cilck");
             }
+        }
+
+    }
+
+
+    window.onmousemove = (mouseMoveEvent) => {
+        let moveX = mouseMoveEvent.offsetX - 16;
+        let moveY = mouseMoveEvent.offsetY - 16;
+        console.log(moveX, moveY);
+
+        if (moveDistance != 0) {
+
+            itemRender.y = moveDistance
         }
     }
 
+
+
+
+
+
     setInterval(() => {
+        context2D.save();
         context2D.clearRect(0, 0, canvas.width, canvas.height);
         myStage.draw(context2D);
         itemRender.y--;
+        context2D.restore();
     }, 100)
 
 

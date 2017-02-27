@@ -21,16 +21,7 @@ window.onload = function () {
     itemButton_1.src = "button.gif";
     itemButton_1.name = "itemButton_1";
     itemRender.addChild(itemButton_1);
-    itemBg_1.y = itemButton_1.y = 200;
-    var itemBg_2 = new BitMap();
-    itemBg_2.src = "bg.gif";
-    itemBg_2.name = "itemBg_2";
-    itemRender.addChild(itemBg_2);
-    var itemButton_2 = new BitMap();
-    itemButton_2.src = "button.gif";
-    itemButton_2.name = "itemButton_2";
-    itemRender.addChild(itemButton_2);
-    itemBg_2.y = itemButton_2.y = 400;
+    itemBg_1.y = itemButton_1.y = 100;
     /*
     API test with secondStage
     */
@@ -57,25 +48,83 @@ window.onload = function () {
     secondStage.addChild(tf2);
 */
     myStage.addChild(itemRender);
-    window.onmousedown = function (e) {
-        var x = e.offsetX - 16;
-        var y = e.offsetY - 32;
-        console.log(x, y);
-        var type = "mousedown";
-        var target = itemRender.hitTest(x, y);
-        var result = target;
-        if (result) {
-            while (result.parent) {
-                var currentTarget = result.parent;
-                var e_1 = { type: type, target: target, currentTarget: currentTarget };
-                result = result.parent;
+    var init_TouchPointY;
+    var rdown;
+    var moveDistance;
+    window.onmouseup = function (mouseUpEvent) {
+        var upX = mouseUpEvent.offsetX - 16;
+        var upY = mouseUpEvent.offsetY - 16;
+        console.log("up: " + upX, "up: " + upY);
+        var type = "mouseup";
+        var upTarget = itemRender.hitTest(upX, upY);
+        var upResult = upTarget;
+        if (upResult) {
+            if (rdown == upResult) {
+                alert("one click");
+                console.log("cilck");
             }
         }
     };
+    /*
+    window.onmouseup = (up) => {
+        var upEvent = new TouchEvents(down.offsetX, down.offsetY, TouchEvents.MOUSEUP)
+        var upChain = stage.hitTest(upEvent);
+        stage.dispatchEvent("capture", upChain, upEvent);
+        stage.dispatchEvent("bubble", upChain, upEvent);
+        //比较鼠标是否点击同一物体
+        try {
+            if (downChain[downChain.length - 1].id == upChain[upChain.length - 1].id) {
+                //鼠标点击
+                var clickEvent = new TouchEvents(up.offsetX, up.offsetY, TouchEvents.CLICK)
+                var clickChain = stage.hitTest(clickEvent);
+                stage.dispatchEvent("capture", clickChain, clickEvent);
+                stage.dispatchEvent("bubble", clickChain, clickEvent);
+            }
+        } catch (e) { }
+    }
+    */
+    itemRender.addEventListener(TouchEventType.MOUSEDOWN, function () {
+        window.onmousedown = function (mouseDownEvent) {
+            var downX = mouseDownEvent.offsetX - 16;
+            var downY = init_TouchPointY = mouseDownEvent.offsetY - 16;
+            console.log(downX, downY);
+            var type = "mousedown";
+            var downTarget = itemRender.hitTest(downX, downY);
+            var downResult = downTarget;
+            if (downResult) {
+                /*
+                while (downResult.parent) {
+                    let currentTarget = downResult.parent;
+                    let e = { type, downTarget, currentTarget };
+    
+                    downResult = downResult.parent;
+                    */
+                rdown = downTarget;
+            }
+        };
+    }, false);
+    itemRender.addEventListener(TouchEventType.MOUSEMOVE, function () {
+        window.onmousemove = function (mouseMoveEvent) {
+            var moveX = mouseMoveEvent.offsetX - 16;
+            var moveY = mouseMoveEvent.offsetY - 16;
+            console.log(moveX, moveY);
+            if (moveDistance != 0) {
+                itemRender.y = moveDistance;
+            }
+        };
+    }, true);
+    itemButton_0.addEventListener(TouchEventType.CLICK, function () {
+        alert("itemButton_0");
+    }, false);
+    itemButton_1.addEventListener(TouchEventType.CLICK, function () {
+        alert("itemButton_1");
+    }, false);
     setInterval(function () {
+        context2D.save();
         context2D.clearRect(0, 0, canvas.width, canvas.height);
         myStage.draw(context2D);
         itemRender.y--;
+        context2D.restore();
     }, 100);
 };
 //# sourceMappingURL=main.js.map
