@@ -4,6 +4,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var DisplayObject = (function () {
+    /*  1.MouseMove
+        2.MouseClick
+        3.MouseClick
+     */
     function DisplayObject() {
         this.x = 0;
         this.globalX = 0;
@@ -22,56 +26,47 @@ var DisplayObject = (function () {
         this.selfMatrix = new math.Matrix();
         this.globalMatrix = new math.Matrix();
         this.skewMatrix = new math.Matrix();
+        this.eventList = [];
     }
+    DisplayObject.prototype.setOffSetY = function (_y) {
+        this.y = _y;
+    };
     DisplayObject.prototype.setSkewX = function (_skewX) {
         this.skewX = _skewX;
     };
     DisplayObject.prototype.setSkewY = function (_skewY) {
         this.skewY = _skewY;
     };
+    DisplayObject.prototype.addEventListener = function (_type, _func, _isCapture, _target) {
+        var event = new MyEvent(_type, _func, _isCapture, _target);
+        this.eventList.push(event);
+    };
     DisplayObject.prototype.draw = function (_context) {
+        var selfMatrix = new math.Matrix();
+        selfMatrix.updateFromDisplayObject(this.x, this.y, this.scaleX, this.scaleY, this.rotation);
+        this.selfMatrix = selfMatrix;
         this.globalMatrix.updateFromDisplayObject(this.globalX, this.globalY, this.globalscaleX, this.globalscaleY, this.globalrotation);
-        this.selfMatrix.updateFromDisplayObject(this.x, this.y, this.scaleX, this.scaleY, this.rotation);
+        /*
         this.skewMatrix.updateSkewMatrix(this.skewX, this.skewY);
         var temp = new math.Matrix();
         temp = this.globalMatrix;
         this.globalMatrix = math.matrixAppendMatrix(temp, this.skewMatrix);
+        */
         if (this.parent) {
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
             //B的全局矩阵 = B的自己矩阵（相对矩阵） * 其父的全局矩阵
-            this.globalMatrix = math.matrixAppendMatrix(this.selfMatrix, this.parent.globalMatrix);
+            var parentGlobalMatrix = this.parent.globalMatrix;
+            var globalMatrix = math.matrixAppendMatrix(this.selfMatrix, this.parent.globalMatrix);
+            this.globalMatrix = globalMatrix;
+            _context.setTransform(globalMatrix.a, globalMatrix.b, globalMatrix.c, globalMatrix.d, globalMatrix.tx, globalMatrix.ty);
         }
         else {
-            _context.globalAlpha = this.globalAlpha;
+            this.globalAlpha = this.alpha;
+            this.globalMatrix = selfMatrix;
+            _context.setTransform(selfMatrix.a, selfMatrix.b, selfMatrix.c, selfMatrix.d, selfMatrix.tx, selfMatrix.ty);
         }
-        _context.setTransform(this.globalMatrix.a, this.globalMatrix.b, this.globalMatrix.c, this.globalMatrix.d, this.globalMatrix.tx, this.globalMatrix.ty);
+        _context.globalAlpha = this.globalAlpha;
         this.render(_context);
-    };
-    DisplayObject.prototype.addEventListener = function (type, func, capture) {
-        var event = new TouchListener(type, func, capture);
-        this.listeners.push(event);
-    };
-    DisplayObject.prototype.dispatchEvent = function (isCapture, chain, event) {
-        /*
-        if (chain) {
-            var transformedChain = chain.slice(0);
-            if (!isCapture) {
-                transformedChain.reverse();
-            }
-            for (var i = 0; i < transformedChain.length; i++) {//逆向遍历点击事件链的元素
-                var element = transformedChain[i];
-                element.listeners.forEach((value) => {//每个元素派发事件
-                    var t = (type == "capture") ? value.capture : !value.capture;
-                    if (value.type == event.type && t) {
-                        //value.obj.func();todo更新func调用
-                        value.func();
-                    }
-                });
-            }
-        } else
-            console.log("no chain");
-    }
-    */
     };
     return DisplayObject;
 }());
@@ -99,12 +94,16 @@ var TextField = (function (_super) {
             _context.font = this.font_Style + this.size + "px " + this.font_family;
         }
         _context.fillStyle = this.textColor;
-        _context.fillText(this.text, this.x, this.y + 15);
+        _context.fillText(this.text, 0, 0 + 15);
     };
     TextField.prototype.hitTest = function (_relativeX, _relativeY) {
         var testRect = new math.Rectangle(0, 0, 10 * this.text.length, 20);
         var checkPoint = new math.Point(_relativeX, _relativeY);
         if (testRect.isPointInRectangle(checkPoint)) {
+            var manageList = TouchEventService.getInstance().manageList;
+            if (this.eventList.length != 0) {
+                manageList.push(this);
+            }
             console.log(this.name);
             console.log(true);
             return this;
@@ -133,13 +132,13 @@ var BitMap = (function (_super) {
             var image = new Image();
             image.src = this.src;
             image.onload = function () {
-                _context.drawImage(image, _this.x, _this.y);
+                _context.drawImage(image, 0, 0);
                 _this.bitmap_cache = image;
-                //console.log(this.bitmap_cache.width, this.bitmap_cache.height);
+                console.log(_this.bitmap_cache.width, _this.bitmap_cache.height);
             };
         }
         else {
-            _context.drawImage(this.bitmap_cache, this.x, this.y);
+            _context.drawImage(this.bitmap_cache, 0, 0);
         }
     };
     BitMap.prototype.hitTest = function (_relativeX, _relativeY) {
@@ -148,6 +147,10 @@ var BitMap = (function (_super) {
         if (testRect.isPointInRectangle(checkPoint)) {
             console.log("reaction " + this.name);
             //alert(true);
+            var manageList = TouchEventService.getInstance().manageList;
+            if (this.eventList.length != 0) {
+                manageList.push(this);
+            }
             return this;
         }
         else {
@@ -165,8 +168,8 @@ var DisplayObjectContainer = (function (_super) {
         this.array = new Array();
     }
     DisplayObjectContainer.prototype.addChild = function (_child) {
-        this.array.push(_child);
         _child.parent = this;
+        this.array.push(_child);
     };
     DisplayObjectContainer.prototype.render = function (_context) {
         for (var _i = 0, _a = this.array; _i < _a.length; _i++) {
@@ -175,11 +178,15 @@ var DisplayObjectContainer = (function (_super) {
         }
     };
     DisplayObjectContainer.prototype.hitTest = function (_relativeX, _relativeY) {
+        var manageList = TouchEventService.getInstance().manageList;
+        if (this.eventList.length != 0) {
+            manageList.push(this);
+        }
         for (var i = this.array.length - 1; i >= 0; i--) {
             var child = this.array[i];
+            var invertMatrix = math.invertMatrix(child.selfMatrix);
             var tempPoint = new math.Point(_relativeX, _relativeY);
             //
-            var invertMatrix = math.invertMatrix(child.globalMatrix);
             //没有计算过他的相对矩阵,计算一个矩阵的相对矩阵
             //inv this.array[i].selfMatrix
             var relativePoint = math.pointAppendMatrix(tempPoint, invertMatrix);

@@ -34,23 +34,24 @@ class MyEvent {
 }
 
 class TouchEventService {
-
-
-    private static instance;
-    private static count = 0;
-    private manageList: DisplayObject[];
+    // private static count = 0;
+    manageList: DisplayObject[];
+    static touchEventService:TouchEventService;
     constructor() {
-        TouchEventService.count++;
-        if (TouchEventService.count > 1) {
-            throw 'singleton!!';
-        }
+        // TouchEventService.count++;
+        // if (TouchEventService.count > 1) {
+        //     throw 'singleton!!';
+        // }
     }
 
     public static getInstance() {
-        if (TouchEventService.instance == null) {
-            TouchEventService.instance = new TouchEventService();
+        if (TouchEventService.touchEventService == null) {
+            TouchEventService.touchEventService = new TouchEventService();
+            TouchEventService.touchEventService.manageList=new Array();
+            return TouchEventService.touchEventService;
+        }else{
+            return TouchEventService.touchEventService;
         }
-        return TouchEventService.instance;
     }
 
 

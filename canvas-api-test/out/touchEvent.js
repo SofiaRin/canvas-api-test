@@ -5,38 +5,48 @@ var TouchEventType;
     TouchEventType[TouchEventType["MOUSEMOVE"] = 3] = "MOUSEMOVE";
     TouchEventType[TouchEventType["CLICK"] = 2] = "CLICK";
 })(TouchEventType || (TouchEventType = {}));
-var Touch_Event = (function () {
-    function Touch_Event(x, y, type) {
+/*
+class MyEvent {
+    x: number;
+    y: number;
+    type: number;
+    target
+    currentTarget
+    constructor(x: number, y: number, type: number) {
         this.x = x;
         this.y = y;
         this.type = type;
     }
-    return Touch_Event;
-}());
-var TouchListener = (function () {
-    function TouchListener(type, func, isCapture) {
+
+}
+*/
+var MyEvent = (function () {
+    function MyEvent(_type, _func, _isCapture, _target) {
         this.isCapture = false;
-        this.type = type;
-        this.func = func;
-        this.isCapture = isCapture;
+        this.type = _type;
+        this.func = _func;
+        this.isCapture = _isCapture;
+        this.target = _target;
     }
-    return TouchListener;
+    return MyEvent;
 }());
 var TouchEventService = (function () {
     function TouchEventService() {
-        this.eventList = [];
-        TouchEventService.count++;
-        if (TouchEventService.count > 1) {
-            throw 'singleton!!';
-        }
+        // TouchEventService.count++;
+        // if (TouchEventService.count > 1) {
+        //     throw 'singleton!!';
+        // }
     }
     TouchEventService.getInstance = function () {
-        if (TouchEventService.instance == null) {
-            TouchEventService.instance = new TouchEventService();
+        if (TouchEventService.touchEventService == null) {
+            TouchEventService.touchEventService = new TouchEventService();
+            TouchEventService.touchEventService.manageList = new Array();
+            return TouchEventService.touchEventService;
         }
-        return TouchEventService.instance;
+        else {
+            return TouchEventService.touchEventService;
+        }
     };
-    TouchEventService.count = 0;
     return TouchEventService;
 }());
-//# sourceMappingURL=touchEvent.js.map
+//# sourceMappingURL=TouchEvent.js.map
