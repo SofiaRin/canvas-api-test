@@ -1,3 +1,4 @@
+/*
 window.onload = () => {
     var canvas = document.getElementById('test_canvas') as HTMLCanvasElement;
     var context2D = canvas.getContext("2d");
@@ -34,7 +35,7 @@ window.onload = () => {
         alert("second Click");
 
     }, false, this);
-    */
+    
     
     var itemBg_0 = new BitMap();
     itemBg_0.src = "bg.gif";
@@ -93,7 +94,7 @@ window.onload = () => {
     tf2.isbold = true;
     tf2.size = 15;
     secondStage.addChild(tf2);
-*/
+
 
 
     var init_TouchPointX, init_TouchPointY, end_TouchPointX, end_TouchPointY;
@@ -125,7 +126,7 @@ window.onload = () => {
                 let e = { type, downTarget, currentTarget };
  
                 downResult = downResult.parent;
-                */
+                
             checkDownResult = downTarget;
         }
 
@@ -164,7 +165,7 @@ window.onload = () => {
                 console.log("cilck");
             }
         }
-        */
+        
     }
 
 
@@ -218,4 +219,4 @@ window.onload = () => {
 
 
 };
-
+*/
