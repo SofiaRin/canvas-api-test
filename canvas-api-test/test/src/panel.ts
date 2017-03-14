@@ -19,23 +19,29 @@ class ShowPanel extends engine.DisplayObjectContainer {
         this.width = _width;
         this.height = _height;
 
-        this.role = this.createBitmapByName("S_Prinz Eugen_jpg");
+        this.role = this.createBitmapByName("S_Prinz Eugen.jpg");
+        this.role.setWidth(261);
+        this.role.setHeight(380);
+
         this.addChild(this.role);
         //
-        this.equipment_1 = this.createBitmapByName("S_SKC34_png");
+        this.equipment_1 = this.createBitmapByName("S_SKC34.png");
+        this.equipment_1.setWidth(190);
         this.addChild(this.equipment_1);
         this.equipment_1.x = this.role.width;
+        //console.log("++++" + this.role.width);
 
-        this.equipment_2 = this.createBitmapByName("S_Setuper_png");
+        this.equipment_2 = this.createBitmapByName("S_Setuper.png");
+        this.equipment_2.setWidth(190);
         this.addChild(this.equipment_2);
         this.equipment_2.x = this.width - this.equipment_2.width;
         /*
-              this.equipment_3 = this.createBitmapByName("S_Watcher_png");
+              this.equipment_3 = this.createBitmapByName("S_Watcher.png");
               this.addChild(this.equipment_3);
               this.equipment_3.x = this.role.width;
               this.equipment_3.y = this.equipment_1.height;
               //
-              this.equipment_4 = this.createBitmapByName("S_Setuper_png");
+              this.equipment_4 = this.createBitmapByName("S_Setuper.png");
               this.addChild(this.equipment_4);
               this.equipment_4.x = this.width - this.equipment_2.width;
               this.equipment_4.y = this.equipment_1.height;
@@ -46,7 +52,7 @@ class ShowPanel extends engine.DisplayObjectContainer {
         // this.onClickEquipment_4(this.equipment_4);
 
         this.allInfo = new engine.TextField();
-        this.allInfo.width = this.role.width;
+        //this.allInfo.nextLine = 40;
         this.allInfo.y = this.role.height;
         this.addChild(this.allInfo);
         this.allInfo.text = ("All----------------------|");
@@ -54,7 +60,7 @@ class ShowPanel extends engine.DisplayObjectContainer {
         this.equipmentInfo = new engine.TextField();
         this.equipmentInfo.x = this.role.width;
         this.equipmentInfo.y = this.role.height;
-        this.equipmentInfo.width = this.equipment_1.width * 2;
+        //this.equipmentInfo.nextLine = 40;
         this.addChild(this.equipmentInfo);
         this.equipmentInfo.text = ("Equiment------------------------|");
 

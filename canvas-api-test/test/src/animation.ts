@@ -17,7 +17,8 @@ class Animation {
         if (this.timePassed >= 1000 / this.FPS) {
             this.timePassed -= (1000 / this.FPS);
             this.curFrame = (++this.curFrame) % this.textureList.length;
-           //Test --  this.self.texture = RES.getRes(this.textureList[this.curFrame]);////////////////////////////
+          // this.self.texture = RES.getRes(this.textureList[this.curFrame]);////////////////////////////
+           this.self = createBitmapByName(this.textureList[this.curFrame]);
             // console.log("current frame:"+this.textureList[this.curFrame]);
         }
     }
@@ -27,9 +28,20 @@ class Animation {
             this.timePassed -= (1000 / this.FPS);
             var list = this.textureList[order];
             if (this.curFrame < list.length) {
-            //Test --     this.self.texture = RES.getRes(list[this.curFrame]);/////////////////////////////
+            //this.self.texture = RES.getRes(list[this.curFrame]);/////////////////////////////
+             this.self = createBitmapByName(this.textureList[this.curFrame]);
                 this.curFrame++;
             }
         }
     }
+
+    
+    createBitmapByName(name: string): engine.BitMap {
+        var result = new engine.BitMap();
+        //var texture: engine.Texture = RES.getRes(name);
+        //  result.texture = texture;
+        result.src = "assets/" + name;
+        return result;
+    }
+
 }

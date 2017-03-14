@@ -26,7 +26,6 @@
 //  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //////////////////////////////////////////////////////////////////////////////////////
-
 class Main extends engine.DisplayObjectContainer {
 
 
@@ -38,8 +37,8 @@ class Main extends engine.DisplayObjectContainer {
     private stage: engine.DisplayObjectContainer;
     private stageWidth = 640;
     private stageHeight = 1236;
-    public stageX: number;
-    public stageY: number;
+    public stageX = 0;
+    public stageY = 0;
     /**
      * 加载进度界面
      * Process interface loading
@@ -50,11 +49,9 @@ class Main extends engine.DisplayObjectContainer {
 
     //private loadingView: LoadingUI;
 
-    public constructor() {
+    public constructor(_stage) {
         super();
-        this.canvas = document.getElementById("app") as HTMLCanvasElement;
-
-        this.stage = engine.run(canvas);
+        this.stage = _stage;
 
         // this.addEventListener(engine.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
@@ -68,7 +65,7 @@ class Main extends engine.DisplayObjectContainer {
             "npc_0", "npc_1", TaskStatus.ACCEPTABLE, new NPCTalkTaskCondition(), 1, task02);
 
         var monster_0 = new KillMonsterButton("B27", 0, stageH / 2);
-        this.addChild(monster_0);
+        this.stage.addChild(monster_0);
         monster_0.scaleX = 0.5;
         monster_0.scaleY = 0.5;
         monster_0.x = 0;
@@ -77,10 +74,10 @@ class Main extends engine.DisplayObjectContainer {
         TaskService.getInstance().addTask(task01);
         TaskService.getInstance().addTask(task02);
         var missionPanel = new TaskPanel();
-        this.addChild(missionPanel);
+        this.stage.addChild(missionPanel);
 
         var npc_0 = new NPC("npc_0", stageW / 4, stageH / 2);
-        this.addChild(npc_0);
+        this.stage.addChild(npc_0);
         npc_0.scaleX = 0.5;
         npc_0.scaleY = 0.5;
         npc_0.x = stageW / 4;
@@ -88,7 +85,7 @@ class Main extends engine.DisplayObjectContainer {
 
 
         var npc_1 = new NPC("npc_1", stageW / 2.5, stageH / 4);
-        this.addChild(npc_1);
+        this.stage.addChild(npc_1);
         npc_1.scaleX = 0.5;
         npc_1.scaleY = 0.5;
         npc_1.x = stageW / 2.5;
@@ -141,13 +138,13 @@ class Main extends engine.DisplayObjectContainer {
         showPanel.x = 0;
         showPanel.y = 640;
 
-        this.addChild(showPanel);
+        this.stage.addChild(showPanel);
     }
     /**
      * 创建游戏场景
      * Create a game scene
      */
-    private createGameScene(): void {
+    public createGameScene(): void {
 
         var myscene = new GameScene();
         GameScene.replaceScene(myscene);
@@ -157,22 +154,18 @@ class Main extends engine.DisplayObjectContainer {
         var myRoad = GameScene.sceneRoad;
 
         var myMap = GameScene.sceneMap;
-        this.addChild(myMap);
+        this.stage.addChild(myMap);
 
         var player = new Player();
-        this.addChild(player);
+        this.stage.addChild(player);
         player.x = 32;
         player.y = 32;
         GameScene.setPlayer(player);
         this.touchEnabled = true;
 
-        //this.stage
-        window.onmousedown = (onmousedown) => {
-            this.stageX = onmousedown.offsetX - 16;
-            this.stageY = onmousedown.offsetY - 16;
-
-        }
+    
         myMap.addEventListener(engine.TouchEventType.CLICK, () => {
+         
 
             var disNpc_0 = Math.sqrt(Math.pow(this.stageX - 640 / 4, 2) + Math.pow(this.stageY - 1236 / 2, 2));
             var disNpc_1 = Math.sqrt(Math.pow(this.stageX - 640 / 2.5, 2) + Math.pow(this.stageY - 1236 / 4, 2));
@@ -236,74 +229,85 @@ class Main extends engine.DisplayObjectContainer {
         return result;
     }
 }
+//////Load Game 
+var canvas = document.getElementById("app") as HTMLCanvasElement;
+
+var stage = engine.run(canvas);
+
+var game = new Main(stage);
+
+game.createGameScene();
+
 var checkDownResult;
-    var isMouseDown = false;
-    window.onmousedown = (mouseDownEvent) => {
-        isMouseDown = true;
-        let hitTargetList = engine.TouchEventService.getInstance().manageList;
-        hitTargetList.splice(0, hitTargetList.length);
+var isMouseDown = false;
+window.onmousedown = (mouseDownEvent) => {
+    isMouseDown = true;
+    let hitTargetList = engine.TouchEventService.getInstance().manageList;
+    hitTargetList.splice(0, hitTargetList.length);
 
 
-        let downX = mouseDownEvent.offsetX - 16;
-        let downY = mouseDownEvent.offsetY - 16;
-        let downTarget = stage.hitTest(downX, downY);
+    let downX = mouseDownEvent.offsetX - 16;
+    let downY = mouseDownEvent.offsetY - 16;
+
+    let downTarget = this.stage.hitTest(downX, downY);
+    game.stageX = downX;
+    game.stageY = downY;
+
+    console.log("down " + downX, "down:" + downY);
 
 
-        console.log(downX, downY);
+    let type = "mousedown";
 
+    let downResult = downTarget;
+    if (downResult) {
 
-        let type = "mousedown";
+        while (downResult.parent) {
+            let currentTarget = downResult.parent;
+            let e = { type, downTarget, currentTarget };
 
-        let downResult = downTarget;
-        if (downResult) {
+            downResult = downResult.parent;
 
-            while (downResult.parent) {
-                let currentTarget = downResult.parent;
-                let e = { type, downTarget, currentTarget };
-
-                downResult = downResult.parent;
-
-                checkDownResult = downTarget;
-            }
-
+            checkDownResult = downTarget;
         }
 
     }
+
+}
 
 
 window.onmouseup = (mouseUpEvent) => {
-        isMouseDown = false;
-        let hitTargetList = engine.TouchEventService.getInstance().manageList;
-        hitTargetList.splice(0, hitTargetList.length);
+    isMouseDown = false;
+    let hitTargetList = engine.TouchEventService.getInstance().manageList;
+    hitTargetList.splice(0, hitTargetList.length);
 
-        let upX = mouseUpEvent.offsetX - 16;
-        let upY = mouseUpEvent.offsetY - 16;
-        let upTarget = stage.hitTest(upX, upY);
+    let upX = mouseUpEvent.offsetX - 16;
+    let upY = mouseUpEvent.offsetY - 16;
+    let upTarget = this.stage.hitTest(upX, upY);
 
 
-        console.log("up: " + upX, "up: " + upY);
+    console.log("up: " + upX, "up: " + upY);
 
-        let type = "mouseup";
-        for (let i = hitTargetList.length - 1; i >= 0; i--) {
-            for (let event of hitTargetList[i].eventList) {
-                if (event.type == engine.TouchEventType.CLICK &&
-                    upTarget == checkDownResult) {
-                    event.func(mouseUpEvent);
-                }
+    let type = "mouseup";
+    for (let i = hitTargetList.length - 1; i >= 0; i--) {
+        for (let event of hitTargetList[i].eventList) {
+            if (event.type == engine.TouchEventType.CLICK &&
+                upTarget == checkDownResult) {
+                event.func(mouseUpEvent);
             }
         }
-
-        
-        let upResult = upTarget;
-        if (upResult) {
-
-            if (checkDownResult == upResult) {//对比
-
-                alert("one click");
-                console.log("cilck");
-            }
-        }
-        
     }
+
+
+    let upResult = upTarget;
+    if (upResult) {
+
+        if (checkDownResult == upResult) {//对比
+
+            alert("one click");
+            console.log("cilck");
+        }
+    }
+
+}
 
 

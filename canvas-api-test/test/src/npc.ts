@@ -35,7 +35,7 @@ class NPC extends engine.DisplayObjectContainer implements Observer {
         this.npcMapPosX = _npcMapPosX;
         this.npcMapPosY = _npcMapPosY;
 
-        this.emoji = this.createBitmapByName(_id + "_nullIcon_png");
+        this.emoji = this.createBitmapByName(_id + "_nullIcon.png");
         console.log("Building " + _id)
         this.addChild(this.emoji);
 
@@ -173,22 +173,22 @@ class NPC extends engine.DisplayObjectContainer implements Observer {
     private changeImage() {
         if (this.npcStatus == NpcStatus.NULLICON) {
 
-            this.emoji = this.createBitmapByName(this.id + "_nullIcon_png");
+            this.emoji = this.createBitmapByName(this.id + "_nullIcon.png");
             this.addChild(this.emoji)
         }
 
         if (this.npcStatus == NpcStatus.READY_FOR_ACCEPT) {
-            this.emoji = this.createBitmapByName(this.id + "_taskAcceptable_png");
+            this.emoji = this.createBitmapByName(this.id + "_taskAcceptable.png");
             this.addChild(this.emoji)
         }
 
         if (this.npcStatus == NpcStatus.DURING) {
-            this.emoji = this.createBitmapByName(this.id + "_taskDuring_png");
+            this.emoji = this.createBitmapByName(this.id + "_taskDuring.png");
             this.addChild(this.emoji)
         }
 
         if (this.npcStatus == NpcStatus.READY_FOR_SUBMITTED) {
-            this.emoji = this.createBitmapByName(this.id + "_taskFinish_png");
+            this.emoji = this.createBitmapByName(this.id + "_taskFinish.png");
             this.addChild(this.emoji)
         }
     }

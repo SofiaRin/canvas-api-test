@@ -31,8 +31,8 @@ namespace engine {
 
         skewMatrix: engine.Matrix;
 
-        width: number
-        height: number
+        width = 0;
+        height = 0;
         scaleX = 1;
         globalscaleX = 1;
 
@@ -61,7 +61,17 @@ namespace engine {
             this.skewMatrix = new engine.Matrix();
             this.eventList = [];
         }
+        setWidth(_width: number) {
 
+            this.width = _width;
+
+        }
+
+        setHeight(_height: number) {
+
+            this.height = _height;
+
+        }
 
         setOffSetY(_y: number) {
             this.y = _y;
@@ -76,7 +86,7 @@ namespace engine {
             this.skewY = _skewY;
         }
 
-        setTouchEnabled(_isEnalbe:boolean){
+        setTouchEnabled(_isEnalbe: boolean) {
             this.touchEnabled = _isEnalbe;
         }
 
@@ -126,13 +136,42 @@ namespace engine {
 
     export class TextField extends DisplayObject {
         text: string;
-        textColor: string = "#FF00FF";
-
+        textColor: string = "#000000";
+        nextLine = 78
         font_family: string = "normal";
-        size: number = 10;
+        size: number = 15;
         isbold: boolean = false;
         isitalic: boolean = false;
         font_Style: string;
+
+        private draw_long_text(longtext, cxt, begin_width, begin_height) {
+            var linelenght = 20;
+            var text = "";
+            var count = 0;
+            var begin_width = begin_width;
+            var begin_height = begin_height;
+            var stringLenght = longtext.length;
+            var newtext = longtext.split("");
+            var context = cxt;
+            context.textAlign = 'left';
+
+            for (var i = 0; i <= stringLenght; i++) {
+
+                if (count == this.nextLine) {
+                    context.fillText(text, begin_width, begin_height);
+                    begin_height = begin_height + 25;
+                    text = "";
+                    count = 0;
+                }
+                if (i == stringLenght) {
+                    context.fillText(text, begin_width, begin_height);
+                }
+                var text = text + newtext[0];
+                count++;
+                newtext.shift();
+            }
+        }
+
         render(_context: CanvasRenderingContext2D) {
             if (this.visible) {
                 if (this.isitalic) {
@@ -149,9 +188,12 @@ namespace engine {
                     _context.font = this.font_Style + this.size + "px " + this.font_family;
                 }
                 _context.fillStyle = this.textColor;
-                _context.fillText(this.text, 0, 0 + 15);
+               // _context.fillText(this.text, 0, 0 + 15,550);
+                this.draw_long_text(this.text,_context,0,30);
             }
         }
+
+
 
         hitTest(_relativeX: number, _relativeY: number) {
             if (this.touchEnabled) {
@@ -186,6 +228,10 @@ namespace engine {
         bitmap_cache: HTMLImageElement;
 
         image: HTMLImageElement;
+
+        private w;
+        private h;
+
         /*
         constructor(){
             super();
@@ -198,21 +244,27 @@ namespace engine {
                     var image = new Image();
                     image.src = this.src;
 
+
                     image.onload = () => {
                         _context.drawImage(image, 0, 0);
                         this.bitmap_cache = image;
                         console.log(this.bitmap_cache.width, this.bitmap_cache.height);
+                        this.width = image.width;
+                        this.height = image.height;
+
                     }
                 } else {
 
                     _context.drawImage(this.bitmap_cache, 0, 0);
                 }
+
             }
+
         }
 
         hitTest(_relativeX: number, _relativeY: number) {
             if (this.touchEnabled) {
-                var testRect = new engine.Rectangle(0, 0, this.bitmap_cache.width, this.bitmap_cache.height);
+                var testRect = new engine.Rectangle(0, 0, this.width, this.height);
                 var checkPoint = new engine.Point(_relativeX, _relativeY);
 
                 if (testRect.isPointInRectangle(checkPoint)) {
@@ -237,7 +289,7 @@ namespace engine {
             }
         }
     }
-    
+
     export class DisplayObjectContainer extends DisplayObject {
         array = new Array<DisplayObject>();
 

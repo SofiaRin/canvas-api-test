@@ -11,23 +11,23 @@ class DialoguePanel extends engine.DisplayObjectContainer {
         super();
         this.endTalkFlag = false;
         this.visible = false;
-        this.dialoguePanelBg = this.createBitmapByName("DialogueBg_png");
+        this.dialoguePanelBg = this.createBitmapByName("DialogueBg.png");
         this.addChild(this.dialoguePanelBg);
 
 
-        this.btn_Accept = this.createBitmapByName("Accept_png");
+        this.btn_Accept = this.createBitmapByName("Accept.png");
         this.addChild(this.btn_Accept)
         this.btn_Accept.x = 140
         this.btn_Accept.y = 100
         this.btn_Accept.setTouchEnabled(true);
 
-        this.btn_Finish = this.createBitmapByName("Finish_png");
+        this.btn_Finish = this.createBitmapByName("Finish.png");
         this.addChild(this.btn_Finish)
         this.btn_Finish.x = 0
         this.btn_Finish.y = 100
         this.btn_Finish.setTouchEnabled(true);
 
-        this.btn_Close = this.createBitmapByName("Close_s_png");
+        this.btn_Close = this.createBitmapByName("Close_s.png");
         this.addChild(this.btn_Close)
         this.btn_Close.x = 220
         this.btn_Close.y = 0

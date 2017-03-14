@@ -57,8 +57,10 @@ class Ship {
     }
 
     public disPlayDetail() {
-        ShowPanel.all.size = 25;
+        ShowPanel.all.size = 20;
+        ShowPanel.all.y = 30;
         ShowPanel.all.text = "";
+        ShowPanel.all.nextLine = 15;
         ShowPanel.all.text =
             "Attack: + " + this.getAttack().toString() + "\n"
             + "FightPower: + " + Math.floor(this.calFightPower()).toString() + "\n"

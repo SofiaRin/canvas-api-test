@@ -1,4 +1,4 @@
-
+/*
 var Cache: MethodDecorator = (target: any, propertyKey, descriptor: PropertyDescriptor) => {
 
     const method = descriptor.value;
@@ -15,7 +15,7 @@ var Cache: MethodDecorator = (target: any, propertyKey, descriptor: PropertyDesc
     }
     return descriptor;
 }
-
+*/
 
 
 enum EquipmentType {
@@ -63,6 +63,9 @@ class Equipment {
     }
 
     public disPlayDetail() {
+        ShowPanel.detailed.nextLine = 25;
+        ShowPanel.detailed.y = 30;
+
         ShowPanel.detailed.text = "";
         ShowPanel.detailed.text = "Attack: + " + this.getAttack().toString() + "\n" 
         + "Current_Status: + " + this.getStatus().toString() + "\n"

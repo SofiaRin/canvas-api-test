@@ -1,5 +1,6 @@
 var PLAYER_SPEED = 0.2;
 
+
 class Player extends engine.DisplayObjectContainer {
     appearance: engine.BitMap;
     fsm: StateMachine;
@@ -39,15 +40,15 @@ class Player extends engine.DisplayObjectContainer {
 
 
         this.animationList = {
-            "idle_left": ["idel1_L_png", "idel2_L_png", "idel3_L_png", "idel4_L_png"],
-            "idle_right": ["idel1_R_png", "idel2_R_png", "idel3_R_png", "idel4_R_png"],
-            "walk_left": ["move1_L_png", "move2_L_png", "move3_L_png", "move4_L_png"],
-            "walk_right": ["move1_R_png", "move2_R_png", "move3_R_png", "move4_R_png"]
+            "idle_left": ["idel1_L.png", "idel2_L.png", "idel3_L.png", "idel4_L.png"],
+            "idle_right": ["idel1_R.png", "idel2_R.png", "idel3_R.png", "idel4_R.png"],
+            "walk_left": ["move1_L.png", "move2_L.png", "move3_L.png", "move4_L.png"],
+            "walk_right": ["move1_R.png", "move2_R.png", "move3_R.png", "move4_R.png"]
         };
 
         //this.LoadPlayer();
         this.fsm = new StateMachine(new IdleState(this));
-        engine.startTick(this.fsm.runMachine, this.fsm);
+        //engine.startTick(this.fsm.runMachine, this.fsm);
         this.addChild(this.appearance);
 
     }
@@ -72,24 +73,24 @@ class Player extends engine.DisplayObjectContainer {
             for (var i = 0; i < 4; i++) {
     
                 this.PlayerIdle_Left[i] =
-                    RES.getRes("idel" + (i + 1) + "_L_png");
+                    RES.getRes("idel" + (i + 1) + "_L.png");
             }
             for (var i = 0; i < 4; i++) {
     
                 this.PlayerWalk_Left[i] =
-                    RES.getRes("move" + (i + 1) + "_L_png");
+                    RES.getRes("move" + (i + 1) + "_L.png");
     
             }
     
             for (var i = 0; i < 4; i++) {
     
                 this.PlayerIdle_Right[i] =
-                    RES.getRes("idel" + (i + 1) + "_R_png");
+                    RES.getRes("idel" + (i + 1) + "_R.png");
             }
             for (var i = 0; i < 4; i++) {
     
                 this.PlayerWalk_Right[i] =
-                    RES.getRes("move" + (i + 1) + "_R_png");
+                    RES.getRes("move" + (i + 1) + "_R.png");
             }
         }
     
@@ -135,14 +136,14 @@ class IdleState implements State {
             this.player.appearance, 4);
     }
 
-
+    
     DuringState(pass: number) {
 
         this.player.curAnimation.playCurcularly(pass);
 
 
     }
-
+    
     ExitState() {
         this.Onidel = false;
 
@@ -209,11 +210,11 @@ class MoveState implements State {
                 */
     }
 
-
+    
     DuringState(pass: number) {
         this.player.curAnimation.playCurcularly(pass);
     }
-
+    
     ExitState() {
         this.OnMove = false;
         this.isOnposition = true;

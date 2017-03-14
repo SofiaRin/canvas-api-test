@@ -55,7 +55,7 @@ class KillMonsterButton extends engine.DisplayObjectContainer implements Observe
 
         this.monsterId = _monsterId;
 
-        this.button = this.createBitmapByName("Kill_png");
+        this.button = this.createBitmapByName("Kill.png");
         this.addChild(this.button);
         this.onButtonClick(_monsterId);
 
