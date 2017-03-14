@@ -53,17 +53,19 @@ namespace engine {
             2.MouseClick
             3.MouseClick
          */
+        touchEnabled = false;
+        visible = true;
         constructor() {
             this.selfMatrix = new engine.Matrix();
             this.globalMatrix = new engine.Matrix();
             this.skewMatrix = new engine.Matrix();
             this.eventList = [];
         }
-        
+
 
         setOffSetY(_y: number) {
             this.y = _y;
-            
+
         }
         setSkewX(_skewX: number) {
             this.skewX = _skewX;
@@ -72,6 +74,10 @@ namespace engine {
 
         setSkewY(_skewY: number) {
             this.skewY = _skewY;
+        }
+
+        setTouchEnabled(_isEnalbe:boolean){
+            this.touchEnabled = _isEnalbe;
         }
 
         addEventListener(_type: number, _func: Function, _isCapture: boolean, _target: DisplayObject) {
@@ -128,48 +134,49 @@ namespace engine {
         isitalic: boolean = false;
         font_Style: string;
         render(_context: CanvasRenderingContext2D) {
+            if (this.visible) {
+                if (this.isitalic) {
+                    this.font_Style = "italic ";
+
+                } else {
+                    this.font_Style = "normal ";
+                }
 
 
-            if (this.isitalic) {
-                this.font_Style = "italic ";
-
-            } else {
-                this.font_Style = "normal ";
+                if (this.isbold) {
+                    _context.font = this.font_Style + "bold " + this.size + "px " + this.font_family;
+                } else {
+                    _context.font = this.font_Style + this.size + "px " + this.font_family;
+                }
+                _context.fillStyle = this.textColor;
+                _context.fillText(this.text, 0, 0 + 15);
             }
-
-
-            if (this.isbold) {
-                _context.font = this.font_Style + "bold " + this.size + "px " + this.font_family;
-            } else {
-                _context.font = this.font_Style + this.size + "px " + this.font_family;
-            }
-            _context.fillStyle = this.textColor;
-            _context.fillText(this.text, 0, 0 + 15);
-
-
         }
 
         hitTest(_relativeX: number, _relativeY: number) {
-            var testRect = new engine.Rectangle(0, 0, 10 * this.text.length, 20);
-            var checkPoint = new engine.Point(_relativeX, _relativeY);
-            if (testRect.isPointInRectangle(checkPoint)) {
+            if (this.touchEnabled) {
+                var testRect = new engine.Rectangle(0, 0, 10 * this.text.length, 20);
+                var checkPoint = new engine.Point(_relativeX, _relativeY);
+                if (testRect.isPointInRectangle(checkPoint)) {
 
-                let manageList = TouchEventService.getInstance().manageList;
-                if (this.eventList.length != 0) {
-                    manageList.push(this);
+                    let manageList = TouchEventService.getInstance().manageList;
+                    if (this.eventList.length != 0) {
+                        manageList.push(this);
 
+                    }
+
+                    console.log(this.name);
+                    console.log(true);
+                    return this;
+
+
+                } else {
+
+                    alert(false);
+                    return null;
                 }
-
-                console.log(this.name);
-                console.log(true);
-                return this;
-
-
-            } else {
-
-                alert(false);
-                return null;
             }
+
         }
     }
 
@@ -186,54 +193,51 @@ namespace engine {
         }
         */
         render(_context: CanvasRenderingContext2D) {
-            if (this.bitmap_cache == null) {
-                var image = new Image();
-                image.src = this.src;
+            if (this.visible) {
+                if (this.bitmap_cache == null) {
+                    var image = new Image();
+                    image.src = this.src;
 
-                image.onload = () => {
-                    _context.drawImage(image, 0, 0);
-                    this.bitmap_cache = image;
-                    console.log(this.bitmap_cache.width, this.bitmap_cache.height);
+                    image.onload = () => {
+                        _context.drawImage(image, 0, 0);
+                        this.bitmap_cache = image;
+                        console.log(this.bitmap_cache.width, this.bitmap_cache.height);
+                    }
+                } else {
+
+                    _context.drawImage(this.bitmap_cache, 0, 0);
                 }
-            } else {
-
-                _context.drawImage(this.bitmap_cache, 0, 0);
             }
-
         }
 
         hitTest(_relativeX: number, _relativeY: number) {
-            var testRect = new engine.Rectangle(0, 0, this.bitmap_cache.width, this.bitmap_cache.height);
-            var checkPoint = new engine.Point(_relativeX, _relativeY);
+            if (this.touchEnabled) {
+                var testRect = new engine.Rectangle(0, 0, this.bitmap_cache.width, this.bitmap_cache.height);
+                var checkPoint = new engine.Point(_relativeX, _relativeY);
 
-            if (testRect.isPointInRectangle(checkPoint)) {
-                console.log("reaction " + this.name);
-                //alert(true);
+                if (testRect.isPointInRectangle(checkPoint)) {
+                    console.log("reaction " + this.name);
+                    //alert(true);
 
-                let manageList = TouchEventService.getInstance().manageList;
-                if (this.eventList.length != 0) {
-                    manageList.push(this);
+                    let manageList = TouchEventService.getInstance().manageList;
+                    if (this.eventList.length != 0) {
+                        manageList.push(this);
 
+                    }
+
+                    return this;
+
+
+                } else {
+
+                    //alert(false);
+                    console.log("no reaction " + this.name)
+                    return null;
                 }
-
-                return this;
-
-
-            } else {
-
-                //alert(false);
-                console.log("no reaction " + this.name)
-                return null;
             }
-
-
-
-
-
         }
-
     }
-
+    
     export class DisplayObjectContainer extends DisplayObject {
         array = new Array<DisplayObject>();
 
@@ -242,18 +246,29 @@ namespace engine {
             this.array.push(_child);
 
         }
+
+        removeChild(_child: DisplayObject) {
+            for (var i = 0; i < this.array.length; i++) {
+                if (this.array[i] == _child) {
+                    this.array.splice(i, 1);
+                    break;
+                }
+            }
+        }
+
         render(_context: CanvasRenderingContext2D) {
+            if (this.visible) {
+                for (let child of this.array) {
 
-            for (let child of this.array) {
-
-                child.draw(_context);
+                    child.draw(_context);
+                }
             }
         }
 
         hitTest(_relativeX: number, _relativeY: number) {
             let manageList = engine.TouchEventService.getInstance().manageList;
 
-            
+
             if (this.eventList.length != 0) {
                 manageList.push(this);
             }
@@ -283,6 +298,7 @@ namespace engine {
 
         }
     }
+
 
     class MovieClip extends BitMap {
 

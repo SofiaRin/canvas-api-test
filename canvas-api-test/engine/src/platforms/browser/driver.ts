@@ -25,7 +25,5 @@ namespace engine {
         return stage;
 
     }
-
-
-
+    
 }

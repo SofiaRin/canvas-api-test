@@ -1,6 +1,6 @@
 
 namespace engine {
-    enum TouchEventType {
+    export enum TouchEventType {
         MOUSEDOWN = 0,
         MOUSEUP = 1,
         MOUSEMOVE = 3,

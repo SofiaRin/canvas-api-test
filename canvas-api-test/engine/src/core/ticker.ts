@@ -31,4 +31,14 @@ namespace engine {
 
     }
 
+    export var timeStamp = 0;
+    export function startTick (callBack: (timeStamp: number) => boolean, thisObject: any): void{
+        setInterval(()=>{
+            callBack(timeStamp);
+            timeStamp+=16;
+
+        },16)
+
+    }
+
 }
