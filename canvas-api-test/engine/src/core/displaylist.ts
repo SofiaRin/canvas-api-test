@@ -14,10 +14,14 @@ namespace engine {
 
     export interface Drawable {
 
-        render(_context: CanvasRenderingContext2D);
+        update();
     }
 
     export abstract class DisplayObject implements Drawable {
+
+        type = "DisplayObject";
+
+
         name: string;
         x = 0;
         globalX = 0;
@@ -55,7 +59,8 @@ namespace engine {
          */
         touchEnabled = false;
         visible = true;
-        constructor() {
+        constructor(_type:string) {
+            this.type = _type;
             this.selfMatrix = new engine.Matrix();
             this.globalMatrix = new engine.Matrix();
             this.skewMatrix = new engine.Matrix();
@@ -96,7 +101,7 @@ namespace engine {
 
         }
         //模板方法模式
-        draw(_context: CanvasRenderingContext2D) {
+        update() {
             var selfMatrix = new engine.Matrix();
             selfMatrix.updateFromDisplayObject(this.x, this.y, this.scaleX, this.scaleY, this.rotation);
             this.selfMatrix = selfMatrix
@@ -113,23 +118,19 @@ namespace engine {
                 var globalMatrix = engine.matrixAppendMatrix(this.selfMatrix, this.parent.globalMatrix);
                 this.globalMatrix = globalMatrix;
 
-                _context.setTransform(globalMatrix.a, globalMatrix.b,
-                    globalMatrix.c, globalMatrix.d, globalMatrix.tx, globalMatrix.ty)
 
             } else {
 
                 this.globalAlpha = this.alpha;
                 this.globalMatrix = selfMatrix;
 
-                _context.setTransform(selfMatrix.a, selfMatrix.b,
-                    selfMatrix.c, selfMatrix.d,
-                    selfMatrix.tx, selfMatrix.ty);
+       
             }
-            _context.globalAlpha = this.globalAlpha;
-            this.render(_context);
+      
+
         }
 
-        abstract render(_context: CanvasRenderingContext2D)
+    
 
         abstract hitTest(relativeX: number, relativeY: number);
     }
@@ -143,55 +144,16 @@ namespace engine {
         isbold: boolean = false;
         isitalic: boolean = false;
         font_Style: string;
-
-        private draw_long_text(longtext, cxt, begin_width, begin_height) {
-            var linelenght = 20;
-            var text = "";
-            var count = 0;
-            var begin_width = begin_width;
-            var begin_height = begin_height;
-            var stringLenght = longtext.length;
-            var newtext = longtext.split("");
-            var context = cxt;
-            context.textAlign = 'left';
-
-            for (var i = 0; i <= stringLenght; i++) {
-
-                if (count == this.nextLine) {
-                    context.fillText(text, begin_width, begin_height);
-                    begin_height = begin_height + 25;
-                    text = "";
-                    count = 0;
-                }
-                if (i == stringLenght) {
-                    context.fillText(text, begin_width, begin_height);
-                }
-                var text = text + newtext[0];
-                count++;
-                newtext.shift();
-            }
+        
+        
+        constructor(){
+            super("TextField");
+            
         }
 
-        render(_context: CanvasRenderingContext2D) {
-            if (this.visible) {
-                if (this.isitalic) {
-                    this.font_Style = "italic ";
+     
 
-                } else {
-                    this.font_Style = "normal ";
-                }
-
-
-                if (this.isbold) {
-                    _context.font = this.font_Style + "bold " + this.size + "px " + this.font_family;
-                } else {
-                    _context.font = this.font_Style + this.size + "px " + this.font_family;
-                }
-                _context.fillStyle = this.textColor;
-               // _context.fillText(this.text, 0, 0 + 15,550);
-                this.draw_long_text(this.text,_context,0,30);
-            }
-        }
+        
 
 
 
@@ -222,7 +184,7 @@ namespace engine {
         }
     }
 
-    export class BitMap extends DisplayObject {
+    export class Bitmap extends DisplayObject {
         src: string;
 
         bitmap_cache: HTMLImageElement;
@@ -232,35 +194,13 @@ namespace engine {
         private w;
         private h;
 
-        /*
+        
         constructor(){
-            super();
-            this.image
+            super("Bitmap");
+            
         }
-        */
-        render(_context: CanvasRenderingContext2D) {
-            if (this.visible) {
-                if (this.bitmap_cache == null) {
-                    var image = new Image();
-                    image.src = this.src;
-
-
-                    image.onload = () => {
-                        _context.drawImage(image, 0, 0);
-                        this.bitmap_cache = image;
-                        console.log(this.bitmap_cache.width, this.bitmap_cache.height);
-                        this.width = image.width;
-                        this.height = image.height;
-
-                    }
-                } else {
-
-                    _context.drawImage(this.bitmap_cache, 0, 0);
-                }
-
-            }
-
-        }
+        
+      
 
         hitTest(_relativeX: number, _relativeY: number) {
             if (this.touchEnabled) {
@@ -293,6 +233,11 @@ namespace engine {
     export class DisplayObjectContainer extends DisplayObject {
         array = new Array<DisplayObject>();
 
+
+        constructor() {
+            super("DisplayObjectContainer");
+        }
+
         addChild(_child: DisplayObject) {
             _child.parent = this;
             this.array.push(_child);
@@ -308,11 +253,12 @@ namespace engine {
             }
         }
 
-        render(_context: CanvasRenderingContext2D) {
+        update( ) {
             if (this.visible) {
+                super.update();
                 for (let child of this.array) {
 
-                    child.draw(_context);
+                    child.update();
                 }
             }
         }
@@ -352,7 +298,7 @@ namespace engine {
     }
 
 
-    class MovieClip extends BitMap {
+    class MovieClip extends Bitmap {
 
         private advancedTime: number = 0;
 

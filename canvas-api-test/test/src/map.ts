@@ -1,10 +1,4 @@
-window.onmousedown = (onmousedown) => {
-    onmousedown.offsetX - 16;
-    onmousedown.offsetY - 16;
-}
 
-var screenLocalX = 0;
-var screenLocalY = 0;
 
 
 var config = [
@@ -144,11 +138,9 @@ class TileMap extends engine.DisplayObjectContainer {
         }
         this.touchEnabled = true;
         //-Test
-        this.addEventListener(engine.TouchEventType.CLICK, () => {///////////////////////////////////////
-            var localX = screenLocalX;
-            var localY = screenLocalY;
-            var gridX = Math.floor(localX / TileMap.TileSize);
-            var gridY = Math.floor(localY / TileMap.TileSize);
+        this.addEventListener(engine.TouchEventType.CLICK, (evt:MouseEvent) => {///////////////////////////////////////
+            var gridX = Math.floor(evt.offsetX / TileMap.TileSize);
+            var gridY = Math.floor(evt.offsetY / TileMap.TileSize);
             console.log("tap_grid " + gridX + "," + gridY);
         }, false, this)
 

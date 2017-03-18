@@ -164,15 +164,15 @@ class Main extends engine.DisplayObjectContainer {
         this.touchEnabled = true;
 
     
-        myMap.addEventListener(engine.TouchEventType.CLICK, () => {
+        myMap.addEventListener(engine.TouchEventType.CLICK, (evt:MouseEvent) => {
          
 
-            var disNpc_0 = Math.sqrt(Math.pow(this.stageX - 640 / 4, 2) + Math.pow(this.stageY - 1236 / 2, 2));
-            var disNpc_1 = Math.sqrt(Math.pow(this.stageX - 640 / 2.5, 2) + Math.pow(this.stageY - 1236 / 4, 2));
+            var disNpc_0 = Math.sqrt(Math.pow(evt.offsetX - 640 / 4, 2) + Math.pow(evt.offsetY - 1236 / 2, 2));
+            var disNpc_1 = Math.sqrt(Math.pow(evt.offsetX - 640 / 2.5, 2) + Math.pow(evt.offsetY - 1236 / 4, 2));
 
             function getWalkCommand() {
-                console.log("tap_px " + this.stageX + "," + this.stageY);
-                myMap.grid.setEndPoint(Math.floor(this.stageX / Main.TILESIZE), Math.floor(this.stageY / Main.TILESIZE));
+                console.log("tap_px " + evt.offsetX + "," + this.stageY);
+                myMap.grid.setEndPoint(Math.floor(evt.offsetX / Main.TILESIZE), Math.floor(evt.offsetY / Main.TILESIZE));
                 myMap.grid.setStartPoint(Math.floor(player.x / Main.TILESIZE), Math.floor(player.y / Main.TILESIZE));
                 myRoad = myMap.findPath();
                 if (myRoad == null) {
@@ -238,76 +238,9 @@ var game = new Main(stage);
 
 game.createGameScene();
 
-var checkDownResult;
-var isMouseDown = false;
-window.onmousedown = (mouseDownEvent) => {
-    isMouseDown = true;
-    let hitTargetList = engine.TouchEventService.getInstance().manageList;
-    hitTargetList.splice(0, hitTargetList.length);
 
 
-    let downX = mouseDownEvent.offsetX - 16;
-    let downY = mouseDownEvent.offsetY - 16;
-
-    let downTarget = this.stage.hitTest(downX, downY);
-    game.stageX = downX;
-    game.stageY = downY;
-
-    console.log("down " + downX, "down:" + downY);
 
 
-    let type = "mousedown";
-
-    let downResult = downTarget;
-    if (downResult) {
-
-        while (downResult.parent) {
-            let currentTarget = downResult.parent;
-            let e = { type, downTarget, currentTarget };
-
-            downResult = downResult.parent;
-
-            checkDownResult = downTarget;
-        }
-
-    }
-
-}
-
-
-window.onmouseup = (mouseUpEvent) => {
-    isMouseDown = false;
-    let hitTargetList = engine.TouchEventService.getInstance().manageList;
-    hitTargetList.splice(0, hitTargetList.length);
-
-    let upX = mouseUpEvent.offsetX - 16;
-    let upY = mouseUpEvent.offsetY - 16;
-    let upTarget = this.stage.hitTest(upX, upY);
-
-
-    console.log("up: " + upX, "up: " + upY);
-
-    let type = "mouseup";
-    for (let i = hitTargetList.length - 1; i >= 0; i--) {
-        for (let event of hitTargetList[i].eventList) {
-            if (event.type == engine.TouchEventType.CLICK &&
-                upTarget == checkDownResult) {
-                event.func(mouseUpEvent);
-            }
-        }
-    }
-
-
-    let upResult = upTarget;
-    if (upResult) {
-
-        if (checkDownResult == upResult) {//对比
-
-            alert("one click");
-            console.log("cilck");
-        }
-    }
-
-}
 
 
