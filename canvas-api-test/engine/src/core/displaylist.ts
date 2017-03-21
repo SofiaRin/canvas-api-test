@@ -184,7 +184,7 @@ namespace engine {
         }
     }
 
-    export class Bitmap extends DisplayObject {
+    export class BitMap extends DisplayObject {
         src: string;
 
         bitmap_cache: HTMLImageElement;
@@ -298,7 +298,7 @@ namespace engine {
     }
 
 
-    class MovieClip extends Bitmap {
+    class MovieClip extends BitMap {
 
         private advancedTime: number = 0;
 

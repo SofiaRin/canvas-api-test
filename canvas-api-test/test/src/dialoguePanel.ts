@@ -10,8 +10,10 @@ class DialoguePanel extends engine.DisplayObjectContainer {
     constructor(_npcid: string) {
         super();
         this.endTalkFlag = false;
-        this.visible = false;
+        this.visible = true;
         this.dialoguePanelBg = this.createBitmapByName("DialogueBg.png");
+        this.dialoguePanelBg.x = 100;
+        
         this.addChild(this.dialoguePanelBg);
 
 

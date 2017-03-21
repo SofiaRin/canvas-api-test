@@ -115,7 +115,7 @@ namespace engine {
                 context2D.setTransform(m.a, m.b, m.c, m.d, m.tx, m.ty);
 
                 if (child.type == "Bitmap") {
-                    this.renderBitmap(child as Bitmap);
+                    this.renderBitmap(child as BitMap);
                 }
                 else if (child.type == "TextField") {
                     this.renderTextField(child as TextField);
@@ -126,7 +126,7 @@ namespace engine {
             }
         }
 
-        renderBitmap(bitmap: Bitmap) {
+        renderBitmap(bitmap: BitMap) {
            // this.context2D.drawImage(bitmap.image, 0, 0);
             
       

@@ -40,14 +40,14 @@ class NPC extends engine.DisplayObjectContainer implements Observer {
         this.addChild(this.emoji);
 
 
-
+        
         this.dialoguePanel = new DialoguePanel(this.id);
-
+        this.dialoguePanel.visible = false;
         this.addChild(this.dialoguePanel);
-        this.dialoguePanel.alpha = 0;
-        this.dialoguePanel.x = this.x - this.width / 5;  //-108 , 300
+     
+        this.dialoguePanel.x = this.x;  //-108 , 300
         this.dialoguePanel.y = this.y + 300;
-
+        
         this.onNpcClick();
 
     }
